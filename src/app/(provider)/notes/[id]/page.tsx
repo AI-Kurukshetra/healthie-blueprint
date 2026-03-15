@@ -47,9 +47,9 @@ export default async function NoteDetailPage({
 
     return (
       <div className="space-y-6">
-        <section className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="text-2xl font-semibold text-slate-950">New SOAP Note</h2>
-          <p className="mt-2 text-sm text-slate-600">
+        <section className="hf-card">
+          <h2 className="hf-page-title">New SOAP Note</h2>
+          <p className="mt-2 text-sm text-[var(--text-muted)]">
             Capture the consultation details and either save a draft or sign the note.
           </p>
         </section>
@@ -87,7 +87,7 @@ export default async function NoteDetailPage({
 
   return (
     <div className="space-y-6">
-      <section className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
+      <section className="hf-card">
         <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex items-start gap-4">
             <Avatar size="lg">
@@ -96,7 +96,7 @@ export default async function NoteDetailPage({
             </Avatar>
             <div className="space-y-2">
               <div className="flex flex-wrap items-center gap-2">
-                <h2 className="text-2xl font-semibold text-slate-950">
+                <h2 className="hf-page-title">
                   {note.patient.patientName}
                 </h2>
                 <Badge className="rounded-full border border-slate-200 bg-slate-50 text-slate-700">
@@ -104,7 +104,7 @@ export default async function NoteDetailPage({
                 </Badge>
                 <StatusBadge value={note.status} />
               </div>
-              <p className="text-sm text-slate-600">
+              <p className="text-sm text-[var(--text-muted)]">
                 Created {formatDateTime(note.createdAt)}
               </p>
               {note.appointment ? (
@@ -135,3 +135,4 @@ export default async function NoteDetailPage({
     </div>
   )
 }
+

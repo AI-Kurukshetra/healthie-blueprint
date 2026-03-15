@@ -2,11 +2,12 @@
 
 import Link from "next/link"
 import { useDeferredValue, useState, useTransition } from "react"
-import { FilePlus2, Search } from "lucide-react"
+import { Eye, FilePlus2, Search } from "lucide-react"
 
 import { FetchingOverlay } from "@/components/shared/FetchingOverlay"
 import { EmptyState } from "@/components/shared/EmptyState"
 import { StatusBadge } from "@/components/shared/StatusBadge"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -53,29 +54,29 @@ export function NotesView({ notes }: NotesViewProps) {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-4 rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm lg:flex-row lg:items-end lg:justify-between">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div>
-          <h2 className="text-2xl font-semibold text-slate-950">Clinical Notes</h2>
-          <p className="mt-2 text-sm text-slate-600">
+          <h1 className="hf-page-title">Clinical Notes</h1>
+          <p className="mt-2 text-sm text-[var(--text-muted)]">
             Review and complete SOAP notes across your patient roster.
           </p>
         </div>
         <Link href="/notes/new">
-          <Button className="h-11 rounded-xl bg-sky-500 px-4 text-white hover:bg-sky-600">
+          <Button>
             <FilePlus2 className="h-4 w-4" />
             Create Note
           </Button>
         </Link>
       </div>
 
-      <section className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
+      <section className="hf-card">
         <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
           <div className="space-y-2">
-            <label className="text-sm font-medium text-slate-900" htmlFor="note-search">
+            <label className="hf-label" htmlFor="note-search">
               Search patient or diagnosis
             </label>
             <div className="relative">
-              <Search className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <Search className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-[var(--teal)]" />
               <Input
                 className="pl-9"
                 id="note-search"
@@ -86,12 +87,12 @@ export function NotesView({ notes }: NotesViewProps) {
             </div>
           </div>
           <div className="space-y-2">
-            <label className="text-sm font-medium text-slate-900">Status</label>
+            <label className="hf-label">Status</label>
             <Select
               onValueChange={(value) => startTransition(() => setStatus(value as typeof status))}
               value={status}
             >
-              <SelectTrigger className="h-10 w-full">
+              <SelectTrigger className="w-full">
                 <SelectValue placeholder="Filter by status" />
               </SelectTrigger>
               <SelectContent>
@@ -110,9 +111,7 @@ export function NotesView({ notes }: NotesViewProps) {
         <EmptyState
           action={
             <Link href="/notes/new">
-              <Button className="bg-sky-500 text-white hover:bg-sky-600">
-                Create your first note
-              </Button>
+              <Button>Create your first note</Button>
             </Link>
           }
           description="SOAP notes will appear here after they are created."
@@ -121,9 +120,9 @@ export function NotesView({ notes }: NotesViewProps) {
       ) : (
         <div className="relative">
           <FetchingOverlay isVisible={isPending || deferredQuery !== query} />
-          <div className="hidden overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-sm md:block">
+          <div className="hidden md:block">
             <Table>
-              <TableHeader className="bg-slate-50">
+              <TableHeader>
                 <TableRow>
                   <TableHead>Date</TableHead>
                   <TableHead>Patient</TableHead>
@@ -139,23 +138,23 @@ export function NotesView({ notes }: NotesViewProps) {
                     <TableCell>{formatDate(note.createdAt)}</TableCell>
                     <TableCell>
                       <div>
-                        <p className="font-medium text-slate-950">{note.patientName}</p>
-                        <p className="text-xs text-slate-500">{note.patientId}</p>
+                        <p className="font-medium text-[var(--navy)]">{note.patientName}</p>
+                        <p className="text-xs text-[var(--text-muted)]">{note.patientId}</p>
                       </div>
                     </TableCell>
-                    <TableCell>{note.type}</TableCell>
-                    <TableCell className="max-w-56 text-wrap text-slate-600">
-                      {note.diagnosisCodes.length > 0
-                        ? note.diagnosisCodes.join(", ")
-                        : "No diagnosis code"}
+                    <TableCell>
+                      <Badge className="bg-[var(--teal-light)] text-[var(--teal-dark)]">{note.type}</Badge>
+                    </TableCell>
+                    <TableCell className="max-w-56 text-wrap text-[var(--text-muted)]">
+                      {note.diagnosisCodes.length > 0 ? note.diagnosisCodes.join(", ") : "No diagnosis code"}
                     </TableCell>
                     <TableCell>
                       <StatusBadge value={note.status} />
                     </TableCell>
                     <TableCell>
                       <Link href={`/notes/${note.id}`}>
-                        <Button size="sm" variant="outline">
-                          {note.status === "signed" ? "View" : "Open"}
+                        <Button size="icon-xs" title="View" variant="ghost">
+                          <Eye className="h-4 w-4 text-[var(--teal-dark)]" />
                         </Button>
                       </Link>
                     </TableCell>
@@ -167,21 +166,16 @@ export function NotesView({ notes }: NotesViewProps) {
 
           <div className="space-y-4 md:hidden">
             {filteredNotes.map((note) => (
-              <article
-                key={note.id}
-                className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm"
-              >
+              <article key={note.id} className="rounded-xl border border-[var(--border)] bg-white p-5">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div>
-                    <h3 className="text-lg font-semibold text-slate-950">{note.patientName}</h3>
-                    <p className="text-sm text-slate-500">{note.patientId}</p>
+                    <h3 className="text-lg font-semibold text-[var(--navy)]">{note.patientName}</h3>
+                    <p className="text-sm text-[var(--text-muted)]">{note.patientId}</p>
                   </div>
                   <StatusBadge value={note.status} />
                 </div>
-                <p className="mt-3 text-sm text-slate-600">
-                  {note.diagnosisCodes.length > 0
-                    ? note.diagnosisCodes.join(", ")
-                    : "No diagnosis code"}
+                <p className="mt-3 text-sm text-[var(--text-muted)]">
+                  {note.diagnosisCodes.length > 0 ? note.diagnosisCodes.join(", ") : "No diagnosis code"}
                 </p>
                 <div className="mt-4">
                   <Link href={`/notes/${note.id}`}>

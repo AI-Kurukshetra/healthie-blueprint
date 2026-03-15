@@ -85,7 +85,6 @@ export function ProviderPendingRequestActions({
     <>
       <div className="flex flex-wrap gap-2">
         <LoadingButton
-          className="bg-emerald-600 text-white hover:bg-emerald-700"
           isLoading={isPending && pendingAction === "confirm"}
           loadingText="Approving..."
           onClick={handleConfirm}
@@ -94,14 +93,13 @@ export function ProviderPendingRequestActions({
           Approve
         </LoadingButton>
         <Button
-          className="border-rose-200 text-rose-600 hover:bg-rose-50"
           onClick={() => {
             setFormError(undefined)
             setReason("")
             setOpen(true)
           }}
           type="button"
-          variant="outline"
+          variant="destructive"
         >
           Decline
         </Button>
@@ -141,16 +139,16 @@ export function ProviderPendingRequestActions({
                 setFormError(undefined)
               }}
               type="button"
-              variant="outline"
+              variant="ghost"
             >
               Cancel
             </Button>
             <LoadingButton
-              className="bg-rose-600 text-white hover:bg-rose-700"
               isLoading={isPending && pendingAction === "decline"}
               loadingText="Declining..."
               onClick={handleDecline}
               type="button"
+              variant="destructive"
             >
               Confirm Decline
             </LoadingButton>

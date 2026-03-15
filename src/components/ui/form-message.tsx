@@ -7,8 +7,8 @@ type FormMessageProps = {
 }
 
 const styles = {
-  error: "text-rose-600",
-  success: "text-emerald-600",
+  error: "text-[#DC2626]",
+  success: "text-[#065F46]",
 }
 
 export function FormMessage({
@@ -23,7 +23,7 @@ export function FormMessage({
   return (
     <p
       aria-live="polite"
-      className={cn("text-sm", styles[variant], className)}
+      className={cn("text-[13px]", styles[variant], className)}
       role={variant === "error" ? "alert" : "status"}
     >
       {message}

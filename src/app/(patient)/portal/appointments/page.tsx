@@ -40,11 +40,11 @@ export default async function PortalAppointmentsPage() {
 
   return (
     <div className="space-y-6">
-      <section className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
+      <section className="hf-card">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div>
-            <h2 className="text-2xl font-semibold text-slate-950">My Appointments</h2>
-            <p className="mt-2 text-sm text-slate-600">
+            <h1 className="hf-page-title">My Appointments</h1>
+            <p className="mt-2 text-sm text-[var(--text-muted)]">
               Upcoming and historical appointments available in your account.
             </p>
             {providers.length === 0 ? (
@@ -75,24 +75,16 @@ export default async function PortalAppointmentsPage() {
             return (
               <article
                 key={appointment.id}
-                className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm"
+                className="rounded-[14px] border border-[var(--border)] bg-white px-6 py-5"
               >
                 <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-                  <div className="space-y-2">
+                  <div>
                     <div className="flex flex-wrap items-center gap-2">
-                      <h3 className="text-lg font-semibold text-slate-950">
-                        {appointment.providerName}
-                      </h3>
-                      <Badge className="rounded-full border border-slate-200 bg-slate-50 text-slate-700">
-                        {appointment.type.replace("_", " ")}
-                      </Badge>
+                      <h3 className="text-lg font-semibold text-[var(--navy)]">{appointment.providerName}</h3>
+                      <Badge variant="secondary">{appointment.type.replace("_", " ")}</Badge>
                     </div>
-                    <p className="text-sm text-slate-600">
-                      {appointment.reason || "Consultation"}
-                    </p>
-                    <p className="text-sm text-slate-500">
-                      {formatDateTime(appointment.scheduledAt)}
-                    </p>
+                    <p className="mt-1 text-sm text-[var(--text-muted)]">{appointment.reason || "Consultation"}</p>
+                    <p className="mt-1 text-sm text-[var(--text-muted)]">{formatDateTime(appointment.scheduledAt)}</p>
                   </div>
                   <div className="flex flex-col items-start gap-3 lg:items-end">
                     <StatusBadge
@@ -104,7 +96,7 @@ export default async function PortalAppointmentsPage() {
                     (appointment.status === "confirmed" ||
                       appointment.status === "in_progress") ? (
                       <Link href={`/consultation/${appointment.meetingRoomId}`}>
-                        <Button size="sm">Join Call</Button>
+                        <Button size="sm" variant="join">Join Call</Button>
                       </Link>
                     ) : null}
                   </div>

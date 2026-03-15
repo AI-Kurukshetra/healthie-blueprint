@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server"
 
 import { updateSession } from "@/lib/supabase/middleware"
 
-const PUBLIC_ROUTES = ["/login", "/register", "/auth/callback"]
+const PUBLIC_ROUTES = ["/", "/login", "/register", "/auth/callback"]
 const PROVIDER_ROUTES = [
   "/dashboard",
   "/patients",
@@ -37,7 +37,7 @@ export async function proxy(request: NextRequest) {
   }
 
   if (!user) {
-    if (pathname === "/" || !isPublicRoute) {
+    if (!isPublicRoute) {
       return NextResponse.redirect(new URL("/login", request.url))
     }
 

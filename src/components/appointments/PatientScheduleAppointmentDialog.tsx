@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useRouter } from "next/navigation"
 import { useEffect, useMemo, useState, useTransition } from "react"
@@ -12,6 +12,7 @@ import {
   createAppointmentAction,
   getBookedSlotsAction,
 } from "@/actions/appointments"
+import { DateTimePicker } from "@/components/shared/DateTimePicker"
 import { LoadingButton } from "@/components/shared/LoadingButton"
 import { Button } from "@/components/ui/button"
 import {
@@ -23,7 +24,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { FormMessage } from "@/components/ui/form-message"
-import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import {
   Select,
@@ -70,32 +70,6 @@ const appointmentTypes = [
   },
 ] as const
 
-function buildTimeSlots(slotDuration: number) {
-  const slots: string[] = []
-
-  for (let hour = 9; hour < 17; hour += 1) {
-    for (let minute = 0; minute < 60; minute += slotDuration) {
-      if (hour === 16 && minute > 0) {
-        continue
-      }
-
-      slots.push(
-        `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`
-      )
-    }
-  }
-
-  return slots
-}
-
-function formatSlot(time: string) {
-  const [hours, minutes] = time.split(":").map(Number)
-  const suffix = hours >= 12 ? "PM" : "AM"
-  const displayHour = hours % 12 === 0 ? 12 : hours % 12
-
-  return `${displayHour}:${String(minutes).padStart(2, "0")} ${suffix}`
-}
-
 function getDurationOptions(slotDuration: number) {
   return [...new Set([30, 45, 60, slotDuration])]
     .filter((duration) => duration >= 15 && duration <= 120)
@@ -112,10 +86,6 @@ function formatSpecialty(specialty: string) {
 
 function formatProviderDisplayLabel(provider: PatientBookableProvider) {
   return `${provider.fullName} (${formatSpecialty(provider.specialty)})`
-}
-
-function formatProviderLabel(provider: PatientBookableProvider) {
-  return `${provider.fullName} • ${provider.specialty}`
 }
 
 export function PatientScheduleAppointmentDialog({
@@ -175,15 +145,8 @@ export function PatientScheduleAppointmentDialog({
     !selectedProvider ||
     selectedProvider.availableDays.length === 0 ||
     selectedProvider.availableDays.includes(selectedWeekday.toLowerCase())
-
-  const availableSlots = buildTimeSlots(selectedProvider?.slotDuration ?? 30).filter((time) => {
-    if (!selectedDate) {
-      return true
-    }
-
-    const candidate = new Date(`${selectedDate}T${time}:00`)
-    return candidate > new Date()
-  })
+  const selectedDateTimeValue =
+    selectedDate && selectedTime ? `${selectedDate}T${selectedTime}` : selectedDate ?? undefined
 
   useEffect(() => {
     if (!selectedProvider) {
@@ -287,10 +250,7 @@ export function PatientScheduleAppointmentDialog({
     <Dialog onOpenChange={setOpen} open={open}>
       <DialogTrigger
         render={
-          <Button
-            className="h-11 rounded-xl bg-sky-500 px-4 text-white hover:bg-sky-600"
-            disabled={providers.length === 0}
-          />
+          <Button disabled={providers.length === 0} />
         }
       >
         <CalendarPlus className="h-4 w-4" />
@@ -349,17 +309,56 @@ export function PatientScheduleAppointmentDialog({
 
             <div className="grid gap-5 md:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="appointment_date">Date</Label>
-                <Input
-                  id="appointment_date"
-                  min={new Date().toISOString().split("T")[0]}
-                  type="date"
-                  {...form.register("appointment_date")}
+                <Controller
+                  control={form.control}
+                  name="appointment_date"
+                  render={({ fieldState }) => (
+                    <DateTimePicker
+                      bookedSlots={bookedSlots}
+                      disabled={(date) => {
+                        if (!selectedProvider) {
+                          return true
+                        }
+                        if (selectedProvider.availableDays.length === 0) {
+                          return false
+                        }
+                        const weekday = date
+                          .toLocaleDateString("en-US", { weekday: "long" })
+                          .toLowerCase()
+                        return !selectedProvider.availableDays.includes(weekday)
+                      }}
+                      label="Appointment Date & Time"
+                      minDate={new Date()}
+                      onChange={(dateTime) => {
+                        const [date, time] = dateTime.split("T")
+                        form.setValue("appointment_date", date, {
+                          shouldDirty: true,
+                          shouldValidate: true,
+                        })
+                        form.setValue("appointment_time", time ?? "", {
+                          shouldDirty: true,
+                          shouldValidate: true,
+                        })
+                      }}
+                      onDateChange={(date) => {
+                        form.setValue("appointment_date", date, {
+                          shouldDirty: true,
+                          shouldValidate: true,
+                        })
+                        form.setValue("appointment_time", "", {
+                          shouldDirty: true,
+                          shouldValidate: true,
+                        })
+                      }}
+                      value={selectedDateTimeValue}
+                      error={
+                        fieldState.error?.message ??
+                        form.formState.errors.appointment_time?.message
+                      }
+                    />
+                  )}
                 />
-                {!dayAllowed ? (
-                  <FormMessage message="Selected day is outside provider availability." />
-                ) : null}
-                <FormMessage message={form.formState.errors.appointment_date?.message} />
+                {!dayAllowed ? <FormMessage message="Selected day is outside provider availability." /> : null}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="duration">Duration</Label>
@@ -389,47 +388,12 @@ export function PatientScheduleAppointmentDialog({
               </div>
             </div>
 
-            <div className="space-y-2">
-              <Label>Time</Label>
-              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-                {availableSlots.map((slot) => {
-                  const isBooked = bookedSlots.includes(slot)
-                  const isSelected = selectedTime === slot
-
-                  return (
-                    <button
-                      key={slot}
-                      className={cn(
-                        "min-h-11 rounded-xl border px-3 py-2 text-sm font-medium transition",
-                        isBooked
-                          ? "cursor-not-allowed border-slate-200 bg-slate-100 text-slate-400"
-                          : isSelected
-                            ? "border-sky-500 bg-sky-50 text-sky-700"
-                            : "border-slate-200 bg-sky-50 text-sky-600 hover:bg-sky-500 hover:text-white"
-                      )}
-                      disabled={isBooked || !selectedProvider || !dayAllowed}
-                      onClick={() =>
-                        form.setValue("appointment_time", slot, {
-                          shouldDirty: true,
-                          shouldValidate: true,
-                        })
-                      }
-                      title={isBooked ? "Already booked" : undefined}
-                      type="button"
-                    >
-                      {formatSlot(slot)}
-                    </button>
-                  )
-                })}
-              </div>
-              {!selectedProvider ? (
-                <p className="text-xs text-slate-500">Select a provider to view available slots.</p>
-              ) : null}
-              {isLoadingBookedSlots ? (
-                <p className="text-xs text-slate-500">Checking slot availability...</p>
-              ) : null}
-              <FormMessage message={form.formState.errors.appointment_time?.message} />
-            </div>
+            {!selectedProvider ? (
+              <p className="text-xs text-slate-500">Select a provider to view available slots.</p>
+            ) : null}
+            {isLoadingBookedSlots ? (
+              <p className="text-xs text-slate-500">Checking slot availability...</p>
+            ) : null}
 
             <div className="space-y-2">
               <Label>Type</Label>
@@ -444,8 +408,8 @@ export function PatientScheduleAppointmentDialog({
                         className={cn(
                           "rounded-2xl border p-4 text-left transition",
                           field.value === option.value
-                            ? "border-sky-500 bg-sky-50"
-                            : "border-slate-200 bg-white hover:border-sky-200 hover:bg-slate-50"
+                            ? "border-[var(--teal)] bg-[var(--teal-light)]"
+                            : "border-slate-200 bg-white hover:border-[var(--teal)]/40 hover:bg-slate-50"
                         )}
                         onClick={() => field.onChange(option.value)}
                         type="button"
@@ -476,11 +440,10 @@ export function PatientScheduleAppointmentDialog({
             ) : null}
 
             <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
-              <Button onClick={() => setOpen(false)} type="button" variant="outline">
+              <Button onClick={() => setOpen(false)} type="button" variant="ghost">
                 Cancel
               </Button>
               <LoadingButton
-                className="bg-sky-500 text-white hover:bg-sky-600"
                 isLoading={isPending}
                 loadingText="Booking..."
                 type="submit"
@@ -494,3 +457,4 @@ export function PatientScheduleAppointmentDialog({
     </Dialog>
   )
 }
+

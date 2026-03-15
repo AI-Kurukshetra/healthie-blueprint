@@ -155,7 +155,6 @@ export function AllergiesConditionsEditor({
 
       <div className="flex justify-end">
         <LoadingButton
-          className="bg-sky-500 text-white hover:bg-sky-600"
           isLoading={isPending}
           loadingText="Saving..."
           type="submit"

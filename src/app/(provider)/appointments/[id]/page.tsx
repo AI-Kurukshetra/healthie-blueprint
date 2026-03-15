@@ -66,7 +66,7 @@ export default async function AppointmentDetailPage({
             </Link>
             {canJoinConsultation ? (
               <Link href={`/consultation/${appointment.meetingRoomId}`}>
-                <Button>Join Call</Button>
+                <Button variant="join">Join Call</Button>
               </Link>
             ) : null}
             <Link

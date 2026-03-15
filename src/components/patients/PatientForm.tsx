@@ -11,6 +11,7 @@ import {
   createPatientAction,
   updatePatientAction,
 } from "@/actions/patients"
+import { DatePicker } from "@/components/shared/DatePicker"
 import { TagsInput } from "@/components/shared/TagsInput"
 import { LoadingButton } from "@/components/shared/LoadingButton"
 import { Button } from "@/components/ui/button"
@@ -104,8 +105,8 @@ export function PatientForm({
 
   return (
     <form className="space-y-8" onSubmit={form.handleSubmit(onSubmit)}>
-      <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h2 className="text-lg font-semibold text-slate-950">Personal Information</h2>
+      <section className="hf-card">
+        <h2 className="hf-card-title">Personal Information</h2>
         <div className="mt-5 grid gap-5 md:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="first_name">First Name</Label>
@@ -129,8 +130,19 @@ export function PatientForm({
           </div>
           <div className="space-y-2">
             <Label htmlFor="date_of_birth">Date of Birth</Label>
-            <Input id="date_of_birth" type="date" {...form.register("date_of_birth")} />
-            <FormMessage message={form.formState.errors.date_of_birth?.message} />
+            <Controller
+              control={form.control}
+              name="date_of_birth"
+              render={({ field, fieldState }) => (
+                <DatePicker
+                  maxDate={new Date()}
+                  onChange={field.onChange}
+                  placeholder="Select date of birth"
+                  value={field.value}
+                  error={fieldState.error?.message}
+                />
+              )}
+            />
           </div>
           <div className="space-y-2">
             <Label htmlFor="gender">Gender</Label>
@@ -162,8 +174,8 @@ export function PatientForm({
         </div>
       </section>
 
-      <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h2 className="text-lg font-semibold text-slate-950">Medical Information</h2>
+      <section className="hf-card">
+        <h2 className="hf-card-title">Medical Information</h2>
         <div className="mt-5 grid gap-5 md:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="blood_group">Blood Group</Label>
@@ -228,8 +240,8 @@ export function PatientForm({
         </div>
       </section>
 
-      <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h2 className="text-lg font-semibold text-slate-950">Emergency Contact</h2>
+      <section className="hf-card">
+        <h2 className="hf-card-title">Emergency Contact</h2>
         <div className="mt-5 grid gap-5 md:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="emergency_contact">Contact Name</Label>
@@ -244,8 +256,8 @@ export function PatientForm({
         </div>
       </section>
 
-      <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h2 className="text-lg font-semibold text-slate-950">Insurance</h2>
+      <section className="hf-card">
+        <h2 className="hf-card-title">Insurance</h2>
         <div className="mt-5 grid gap-5 md:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="insurance_provider">Insurance Provider</Label>
@@ -260,7 +272,7 @@ export function PatientForm({
         </div>
       </section>
 
-      <FormMessage className="rounded-xl bg-rose-50 px-3 py-2" message={formError} />
+      <FormMessage className="hf-alert-error" message={formError} />
 
       <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
         <Link href={mode === "create" ? "/patients" : `/patients/${patientId}`}>
@@ -269,7 +281,7 @@ export function PatientForm({
           </Button>
         </Link>
         <LoadingButton
-          className="w-full rounded-xl bg-sky-500 text-white hover:bg-sky-600 sm:w-auto"
+          className="w-full sm:w-auto"
           isLoading={isPending}
           loadingText={mode === "create" ? "Adding patient..." : "Saving changes..."}
           type="submit"
@@ -280,3 +292,4 @@ export function PatientForm({
     </form>
   )
 }
+

@@ -300,13 +300,13 @@ export function MessagingWorkspace({
   }
 
   return (
-    <div className="flex h-[calc(100vh-8rem)] min-h-[640px] flex-col overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-sm lg:flex-row">
-      <aside className="relative flex max-h-[320px] w-full flex-col border-b border-slate-200 lg:max-h-none lg:w-96 lg:border-r lg:border-b-0">
-        <div className="border-b border-slate-200 p-5">
+    <div className="flex h-[calc(100vh-8rem)] min-h-[640px] flex-col overflow-hidden rounded-[20px] border border-[var(--border)] bg-white shadow-[0_1px_3px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.03)] lg:flex-row">
+      <aside className="relative flex max-h-[320px] w-full flex-col border-b border-[var(--border)] lg:max-h-none lg:w-96 lg:border-r lg:border-b-0">
+        <div className="border-b border-[var(--border)] p-5">
           <div className="flex items-start justify-between gap-3">
             <div>
-              <p className="text-sm font-medium text-sky-600">Secure inbox</p>
-              <h2 className="mt-1 text-2xl font-semibold text-slate-950">Messages</h2>
+              <p className="text-sm font-medium text-[var(--teal-dark)]">Secure inbox</p>
+              <h2 className="mt-1 text-2xl font-semibold text-[var(--navy)]">Messages</h2>
             </div>
             <Badge className="rounded-full bg-emerald-50 text-emerald-700">
               Encrypted
@@ -337,9 +337,9 @@ export function MessagingWorkspace({
                   <button
                     key={thread.counterpart.id}
                     className={cn(
-                      "w-full rounded-3xl border px-4 py-4 text-left transition hover:border-sky-200 hover:bg-sky-50/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500",
+                      "w-full rounded-3xl border px-4 py-4 text-left transition hover:border-[var(--teal)]/30 hover:bg-[var(--teal-light)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--teal)]/40",
                       activeCounterpartId === thread.counterpart.id
-                        ? "border-sky-200 bg-sky-50"
+                        ? "border-[var(--teal)]/30 bg-[var(--teal-light)] border-l-[3px] border-l-[var(--teal)]"
                         : "border-transparent bg-white"
                     )}
                     onClick={() => void activateThread(thread.counterpart.id)}
@@ -358,7 +358,7 @@ export function MessagingWorkspace({
                       <div className="min-w-0 flex-1">
                         <div className="flex items-start justify-between gap-3">
                           <div className="min-w-0">
-                            <p className="truncate text-sm font-semibold text-slate-950">
+                            <p className="truncate text-sm font-semibold text-[var(--navy)]">
                               {thread.counterpart.fullName}
                             </p>
                             <div className="mt-1 flex flex-wrap items-center gap-2">
@@ -367,7 +367,7 @@ export function MessagingWorkspace({
                                 value={thread.counterpart.role}
                               />
                               {thread.counterpart.patientCode ? (
-                                <Badge className="rounded-full border border-slate-200 bg-slate-50 text-slate-600">
+                                <Badge className="rounded-full border border-[var(--border)] bg-[var(--surface)] text-[var(--text-muted)]">
                                   {thread.counterpart.patientCode}
                                 </Badge>
                               ) : null}
@@ -375,18 +375,18 @@ export function MessagingWorkspace({
                           </div>
                           <div className="text-right">
                             {thread.lastMessage ? (
-                              <p className="text-xs text-slate-500">
+                              <p className="text-xs text-[var(--text-muted)]">
                                 {formatRelativeTime(thread.lastMessage.createdAt)}
                               </p>
                             ) : null}
                             {thread.unreadCount > 0 ? (
-                              <span className="mt-2 inline-flex min-w-6 items-center justify-center rounded-full bg-sky-500 px-2 py-0.5 text-xs font-semibold text-white">
+                              <span className="mt-2 inline-flex min-w-6 items-center justify-center rounded-full bg-linear-to-br from-[var(--teal)] to-[var(--teal-dark)] px-2 py-0.5 text-xs font-semibold text-white">
                                 {thread.unreadCount}
                               </span>
                             ) : null}
                           </div>
                         </div>
-                        <p className="mt-3 line-clamp-2 text-sm leading-6 text-slate-600">
+                        <p className="mt-3 line-clamp-2 text-sm leading-6 text-[var(--text-muted)]">
                           {thread.lastMessage?.content ?? "No messages yet. Start the conversation."}
                         </p>
                       </div>
@@ -402,7 +402,7 @@ export function MessagingWorkspace({
       <section className="flex min-w-0 flex-1 flex-col">
         {selectedThread ? (
           <>
-            <header className="border-b border-slate-200 px-5 py-4">
+            <header className="border-b border-[var(--border)] px-5 py-4">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-center gap-3">
                   <Avatar size="lg">
@@ -415,16 +415,16 @@ export function MessagingWorkspace({
                     </AvatarFallback>
                   </Avatar>
                   <div>
-                    <h3 className="text-lg font-semibold text-slate-950">
+                    <h3 className="text-lg font-semibold text-[var(--navy)]">
                       {selectedThread.counterpart.fullName}
                     </h3>
-                    <div className="mt-1 flex flex-wrap items-center gap-2 text-sm text-slate-500">
+                    <div className="mt-1 flex flex-wrap items-center gap-2 text-sm text-[var(--text-muted)]">
                       <span className="inline-flex items-center gap-1">
                         <ShieldCheck className="h-4 w-4 text-emerald-500" />
                         Secure conversation
                       </span>
                       {selectedThread.counterpart.patientCode ? (
-                        <Badge className="rounded-full border border-slate-200 bg-slate-50 text-slate-600">
+                        <Badge className="rounded-full border border-[var(--border)] bg-[var(--surface)] text-[var(--text-muted)]">
                           {selectedThread.counterpart.patientCode}
                         </Badge>
                       ) : null}
@@ -433,7 +433,7 @@ export function MessagingWorkspace({
                 </div>
                 {selectedThread.counterpart.patientRecordId ? (
                   <Link
-                    className="text-sm font-medium text-sky-600 hover:text-sky-700"
+                    className="text-sm font-medium text-[var(--teal-dark)] hover:text-[var(--teal)]"
                     href={
                       selectedThread.counterpart.role === "patient"
                         ? `/patients/${selectedThread.counterpart.patientRecordId}`
@@ -448,7 +448,7 @@ export function MessagingWorkspace({
               </div>
             </header>
 
-            <ScrollArea className="flex-1 bg-slate-50/60">
+            <ScrollArea className="flex-1 bg-[var(--surface)]">
               <div className="space-y-4 p-5">
                 {selectedThread.messages.length === 0 ? (
                   <div className="flex h-full min-h-72 items-center justify-center">
@@ -473,15 +473,15 @@ export function MessagingWorkspace({
                           className={cn(
                             "max-w-[85%] rounded-[24px] px-4 py-3 shadow-sm sm:max-w-[70%]",
                             isCurrentUser
-                              ? "bg-sky-500 text-white"
-                              : "border border-slate-200 bg-white text-slate-700"
+                              ? "bg-linear-to-br from-[var(--teal)] to-[var(--teal-dark)] text-white"
+                              : "border border-[var(--border)] bg-white text-slate-700"
                           )}
                         >
                           <p className="text-sm leading-6">{message.content}</p>
                           <p
                             className={cn(
                               "mt-2 text-xs",
-                              isCurrentUser ? "text-sky-100" : "text-slate-400"
+                              isCurrentUser ? "text-white/80" : "text-slate-400"
                             )}
                           >
                             {formatDistanceToNow(new Date(message.createdAt), {
@@ -497,13 +497,13 @@ export function MessagingWorkspace({
             </ScrollArea>
 
             <form
-              className="border-t border-slate-200 bg-white p-5"
+              className="border-t border-[var(--border)] bg-white p-5"
               onSubmit={form.handleSubmit(onSubmit)}
             >
               <div className="space-y-3">
                 <Textarea
                   aria-invalid={Boolean(form.formState.errors.content)}
-                  className="min-h-28 resize-none rounded-3xl border-slate-200 bg-slate-50 px-4 py-3"
+                  className="min-h-28 resize-none rounded-3xl border-[var(--border)] bg-[var(--surface)] px-4 py-3"
                   placeholder={`Message ${selectedThread.counterpart.fullName}`}
                   {...form.register("content")}
                 />
@@ -513,7 +513,7 @@ export function MessagingWorkspace({
                   </p>
                 ) : null}
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                  <p className="text-sm text-slate-500">
+                  <p className="text-sm text-[var(--text-muted)]">
                     Messages stay within the HealthFlow care team and patient thread.
                   </p>
                   <LoadingButton
@@ -531,7 +531,7 @@ export function MessagingWorkspace({
             </form>
           </>
         ) : (
-          <div className="flex flex-1 items-center justify-center bg-slate-50/60 p-6">
+          <div className="flex flex-1 items-center justify-center bg-[var(--surface)] p-6">
             <EmptyState
               description="Choose a conversation from the left panel to review messages or send a new update."
               title="Select a conversation"
@@ -542,3 +542,4 @@ export function MessagingWorkspace({
     </div>
   )
 }
+

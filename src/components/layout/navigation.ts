@@ -1,7 +1,8 @@
 import type { LucideIcon } from "lucide-react"
 import {
-  CalendarPlus2,
   CalendarDays,
+  CalendarPlus2,
+  ClipboardList,
   FileText,
   FlaskConical,
   HeartPulse,
@@ -16,6 +17,7 @@ export type NavigationItem = {
   href: string
   icon: LucideIcon
   label: string
+  section: string
 }
 
 export const providerNavigation: NavigationItem[] = [
@@ -23,64 +25,76 @@ export const providerNavigation: NavigationItem[] = [
     href: "/dashboard",
     icon: LayoutDashboard,
     label: "Dashboard",
+    section: "MAIN",
   },
   {
     href: "/patients",
     icon: Users,
     label: "Patients",
+    section: "PATIENT CARE",
   },
   {
     href: "/appointments",
     icon: CalendarPlus2,
     label: "Appointments",
+    section: "PATIENT CARE",
   },
   {
     href: "/notes",
     icon: FileText,
     label: "Notes",
+    section: "PATIENT CARE",
   },
   {
     href: "/labs",
     icon: FlaskConical,
     label: "Labs",
+    section: "PATIENT CARE",
   },
   {
     href: "/messages",
     icon: MessageSquareMore,
     label: "Messages",
+    section: "COMMUNICATION",
   },
 ]
 
 export const patientNavigation: NavigationItem[] = [
   {
-    href: "/portal",
-    icon: LayoutDashboard,
-    label: "Overview",
-  },
-  {
     href: "/portal/appointments",
     icon: CalendarDays,
     label: "Appointments",
+    section: "MAIN",
   },
   {
     href: "/portal/records",
     icon: FileText,
     label: "Records",
+    section: "MAIN",
   },
   {
-    href: "/portal/ehr",
-    icon: HeartPulse,
-    label: "Health Records",
+    href: "/portal/care-plan",
+    icon: ClipboardList,
+    label: "Care Plan",
+    section: "HEALTH",
   },
   {
     href: "/portal/labs",
     icon: FlaskConical,
     label: "Lab Results",
+    section: "HEALTH",
+  },
+  {
+    href: "/portal/ehr",
+    icon: HeartPulse,
+    label: "EHR",
+    section: "HEALTH",
   },
   {
     href: "/portal/messages",
     icon: MessageSquareMore,
     label: "Messages",
+    section: "COMMUNICATION",
   },
 ]
 

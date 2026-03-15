@@ -12,10 +12,10 @@ export default async function ProviderLayout({
   const shell = await getShellData("provider")
 
   return (
-    <div className="min-h-screen bg-slate-100">
+    <div className="min-h-screen bg-[var(--surface)]">
       <div className="flex min-h-screen">
-        <aside className="hidden w-[260px] border-r border-slate-200 bg-white md:block">
-          <ProviderSidebar specialty={shell.provider?.specialty} />
+        <aside className="hidden w-[260px] border-r border-[rgba(0,212,184,0.2)] bg-[linear-gradient(160deg,#021a12_0%,#011209_60%,#021510_100%)] md:block">
+          <ProviderSidebar fullName={shell.profile.full_name} specialty={shell.provider?.specialty} />
         </aside>
 
         <div className="flex min-h-screen min-w-0 flex-1 flex-col">
@@ -28,7 +28,7 @@ export default async function ProviderLayout({
             role="provider"
             specialty={shell.provider?.specialty}
           />
-          <main className="flex-1 p-4 md:p-6">{children}</main>
+          <main className="flex-1 p-4 md:p-8">{children}</main>
         </div>
       </div>
     </div>

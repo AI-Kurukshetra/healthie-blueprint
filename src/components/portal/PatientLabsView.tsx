@@ -54,8 +54,8 @@ export function PatientLabsView({ orders }: { orders: PatientLabListItem[] }) {
             className={cn(
               "min-h-11 rounded-full px-4 text-sm font-medium transition",
               filter === option.value
-                ? "bg-sky-500 text-white"
-                : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                ? "bg-[var(--teal)] text-white"
+                : "text-[var(--text-muted)] hover:text-[var(--navy)]"
             )}
             onClick={() => setFilter(option.value)}
             type="button"
@@ -80,3 +80,4 @@ export function PatientLabsView({ orders }: { orders: PatientLabListItem[] }) {
     </div>
   )
 }
+

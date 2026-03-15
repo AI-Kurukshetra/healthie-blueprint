@@ -30,9 +30,7 @@ export function CancelAppointmentButton({
 
   return (
     <Dialog onOpenChange={setOpen} open={open}>
-      <DialogTrigger
-        render={<Button className="text-rose-600" size="sm" variant="outline" />}
-      >
+      <DialogTrigger render={<Button size="sm" variant="destructive" />}>
         Cancel
       </DialogTrigger>
       <DialogContent>
@@ -43,13 +41,13 @@ export function CancelAppointmentButton({
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <Button onClick={() => setOpen(false)} type="button" variant="outline">
+          <Button onClick={() => setOpen(false)} type="button" variant="ghost">
             Keep appointment
           </Button>
           <LoadingButton
-            className="bg-rose-600 text-white hover:bg-rose-700"
             isLoading={isPending}
             loadingText="Cancelling..."
+            variant="destructive"
             onClick={() =>
               startTransition(async () => {
                 const result = await cancelAppointmentAction({

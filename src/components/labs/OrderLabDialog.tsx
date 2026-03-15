@@ -96,9 +96,12 @@ export function OrderLabDialog({
   })
 
   const selectedPatientId = form.watch("patient_id")
+  const selectedAppointmentId = form.watch("appointment_id")
   const fixedPatient = prefilledPatientId
     ? patients.find((patient) => patient.id === prefilledPatientId) ?? null
     : null
+  const selectedPatient =
+    patients.find((patient) => patient.id === selectedPatientId) ?? null
   const visiblePatients = useMemo(() => {
     if (fixedPatient) {
       return fixedPatient ? [fixedPatient] : []
@@ -124,6 +127,8 @@ export function OrderLabDialog({
 
     return appointments.filter((appointment) => appointment.patientId === patientId)
   }, [appointments, prefilledPatientId, selectedPatientId])
+  const selectedAppointment =
+    appointmentOptions.find((appointment) => appointment.id === selectedAppointmentId) ?? null
 
   useEffect(() => {
     if (!open) {
@@ -166,7 +171,7 @@ export function OrderLabDialog({
 
   return (
     <Dialog onOpenChange={setOpen} open={open}>
-      <DialogTrigger render={<div>{triggerLabel}</div>} />
+      <DialogTrigger nativeButton={false} render={<div>{triggerLabel}</div>} />
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>Order New Lab</DialogTitle>
@@ -215,7 +220,17 @@ export function OrderLabDialog({
                   value={form.watch("patient_id")}
                 >
                   <SelectTrigger id="lab-patient">
-                    <SelectValue placeholder="Select patient" />
+                    <span
+                      className={
+                        selectedPatient
+                          ? "flex flex-1 text-left"
+                          : "flex flex-1 text-left text-muted-foreground"
+                      }
+                    >
+                      {selectedPatient
+                        ? `${selectedPatient.patientName} (${selectedPatient.patientId})`
+                        : "Select patient"}
+                    </span>
                   </SelectTrigger>
                   <SelectContent>
                     {visiblePatients.map((patient) => (
@@ -274,8 +289,8 @@ export function OrderLabDialog({
                     className={cn(
                       "rounded-2xl border px-4 py-3 text-left text-sm font-medium transition",
                       active
-                        ? "border-sky-500 bg-sky-50 text-sky-700"
-                        : "border-slate-200 bg-white text-slate-700 hover:border-sky-200 hover:bg-slate-50"
+                        ? "border-[var(--teal)] bg-[var(--teal-light)] text-[var(--teal-dark)]"
+                        : "border-slate-200 bg-white text-slate-700 hover:border-[var(--teal)]/40 hover:bg-slate-50"
                     )}
                     onClick={() =>
                       form.setValue("priority", priority, {
@@ -305,7 +320,17 @@ export function OrderLabDialog({
               value={form.watch("appointment_id") || "__none__"}
             >
               <SelectTrigger id="lab-appointment">
-                <SelectValue placeholder="Optional appointment" />
+                <span
+                  className={
+                    selectedAppointment
+                      ? "flex flex-1 text-left"
+                      : "flex flex-1 text-left text-muted-foreground"
+                  }
+                >
+                  {selectedAppointment
+                    ? selectedAppointment.label
+                    : "No appointment linked"}
+                </span>
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="__none__">No appointment linked</SelectItem>
@@ -336,11 +361,10 @@ export function OrderLabDialog({
           ) : null}
 
           <DialogFooter>
-            <Button onClick={() => setOpen(false)} type="button" variant="outline">
+            <Button onClick={() => setOpen(false)} type="button" variant="ghost">
               Cancel
             </Button>
             <LoadingButton
-              className="bg-sky-500 text-white hover:bg-sky-600"
               disabled={patients.length === 0}
               isLoading={isPending}
               loadingText="Ordering..."

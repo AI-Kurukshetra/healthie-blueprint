@@ -26,16 +26,27 @@ const APPOINTMENT_NOTIFICATION_PATHS = [
   "/portal/appointments",
 ]
 
+const optionalUuid = (message: string) =>
+  z.preprocess(
+    (value) => {
+      if (value === null || value === undefined || value === "") {
+        return undefined
+      }
+      return value
+    },
+    z.string().uuid(message).optional()
+  )
+
 const appointmentBookingSchema = appointmentSchema.omit({ patient_id: true }).extend({
-  patient_id: z.string().uuid("Select a patient").optional(),
-  provider_id: z.string().uuid("Select a provider").optional(),
+  patient_id: optionalUuid("Select a patient"),
+  provider_id: optionalUuid("Select a provider"),
 })
 
 const bookedSlotsSchema = z.object({
   appointment_date: z.string().min(1, "Select a date"),
   duration: z.number().min(15).max(120),
-  patient_id: z.string().uuid("Select a patient").optional(),
-  provider_id: z.string().uuid("Select a provider").optional(),
+  patient_id: optionalUuid("Select a patient"),
+  provider_id: optionalUuid("Select a provider"),
   slot_duration: z.number().min(15).max(120),
 })
 
