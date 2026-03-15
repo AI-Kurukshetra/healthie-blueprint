@@ -4,25 +4,35 @@ import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 
 const statusStyles: Record<string, string> = {
-  ordered: "border-blue-200 bg-blue-50 text-blue-700",
-  sample_collected: "border-purple-200 bg-purple-50 text-purple-700",
-  processing: "border-amber-200 bg-amber-50 text-amber-700",
-  scheduled: "border-sky-200 bg-sky-50 text-sky-700",
-  pending_confirmation: "border-amber-200 bg-amber-50 text-amber-700",
-  confirmed: "border-emerald-200 bg-emerald-50 text-emerald-700",
-  in_progress: "border-amber-200 bg-amber-50 text-amber-700",
-  completed: "border-emerald-200 bg-emerald-50 text-emerald-700",
-  cancelled: "border-rose-200 bg-rose-50 text-rose-700",
-  no_show: "border-slate-200 bg-slate-100 text-slate-700",
-  draft: "border-slate-200 bg-slate-100 text-slate-700",
-  signed: "border-emerald-200 bg-emerald-50 text-emerald-700",
-  amended: "border-violet-200 bg-violet-50 text-violet-700",
-  provider: "border-sky-200 bg-sky-50 text-sky-700",
-  patient: "border-teal-200 bg-teal-50 text-teal-700",
-  admin: "border-violet-200 bg-violet-50 text-violet-700",
-  active: "border-emerald-200 bg-emerald-50 text-emerald-700",
-  monitoring: "border-amber-200 bg-amber-50 text-amber-700",
-  new: "border-slate-200 bg-slate-100 text-slate-700",
+  scheduled: "bg-[#FEF3C7] text-[#92400E]",
+  pending: "bg-[#FEF3C7] text-[#92400E]",
+  pending_confirmation: "bg-[#FEF3C7] text-[#92400E]",
+  draft: "bg-[#FEF3C7] text-[#92400E]",
+
+  confirmed: "bg-[#D1FAE5] text-[#065F46]",
+  active: "bg-[#D1FAE5] text-[#065F46]",
+  signed: "bg-[#D1FAE5] text-[#065F46]",
+  provider: "bg-[#D1FAE5] text-[#065F46]",
+  patient: "bg-[#D1FAE5] text-[#065F46]",
+
+  in_progress: "bg-[#DBEAFE] text-[#1E40AF]",
+  processing: "bg-[#DBEAFE] text-[#1E40AF]",
+
+  completed: "bg-[#F1F5F9] text-[#475569]",
+  no_show: "bg-[#F1F5F9] text-[#475569]",
+  amended: "bg-[#F1F5F9] text-[#475569]",
+
+  cancelled: "bg-[#FEE2E2] text-[#991B1B]",
+  declined: "bg-[#FEE2E2] text-[#991B1B]",
+  urgent: "bg-[#FEE2E2] text-[#991B1B]",
+  abnormal: "bg-[#FEE2E2] text-[#991B1B]",
+
+  ordered: "bg-[#DBEAFE] text-[#1E40AF]",
+  sample_collected: "bg-[#DBEAFE] text-[#1E40AF]",
+  monitoring: "bg-[#FEF3C7] text-[#92400E]",
+  new: "bg-[#F1F5F9] text-[#475569]",
+  admin: "bg-[#F1F5F9] text-[#475569]",
+  resolved: "bg-[#D1FAE5] text-[#065F46]",
 }
 
 type StatusBadgeProps = {
@@ -49,15 +59,21 @@ export function StatusBadge({
 }: StatusBadgeProps) {
   const normalizedValue = value.toLowerCase()
   const normalizedTone = (tone ?? value).toLowerCase()
+  const showPulseDot = normalizedTone === "in_progress"
 
   return (
     <Badge
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 font-medium",
-        statusStyles[normalizedTone] ?? "border-slate-200 bg-slate-100 text-slate-700",
+        "inline-flex items-center gap-1.5 rounded-full border-0 px-3 py-1 text-[11px] font-semibold",
+        statusStyles[normalizedTone] ?? "bg-[#F1F5F9] text-[#475569]",
         className
       )}
     >
+      {showPulseDot ? (
+        <span className="relative mr-0.5 inline-flex h-2 w-2 rounded-full bg-[#1E40AF]">
+          <span className="hf-pulse-dot absolute inset-0 rounded-full bg-[#1E40AF]" />
+        </span>
+      ) : null}
       {icon}
       {label ?? formatStatusLabel(normalizedValue)}
     </Badge>

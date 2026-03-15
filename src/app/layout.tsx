@@ -1,19 +1,24 @@
 import type { Metadata } from "next"
-import { Geist, Geist_Mono } from "next/font/google"
+import { DM_Sans, Geist_Mono, Playfair_Display } from "next/font/google"
 import NextTopLoader from "nextjs-toploader"
 
 import { AppProviders } from "@/components/providers"
 
 import "./globals.css"
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const dmSans = DM_Sans({
   subsets: ["latin"],
+  variable: "--font-dm-sans",
+})
+
+const playfairDisplay = Playfair_Display({
+  subsets: ["latin"],
+  variable: "--font-playfair-display",
 })
 
 const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
   subsets: ["latin"],
+  variable: "--font-geist-mono",
 })
 
 export const metadata: Metadata = {
@@ -34,10 +39,10 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body
-        className={`${geistSans.variable} ${geistMono.variable} bg-slate-50 text-slate-950 antialiased`}
+        className={`${dmSans.variable} ${playfairDisplay.variable} ${geistMono.variable} bg-[var(--surface)] text-[var(--text-primary)] antialiased`}
       >
         <AppProviders>
-          <NextTopLoader color="#0EA5E9" height={3} showSpinner={false} />
+          <NextTopLoader color="#00D4B8" height={3} showSpinner={false} />
           {children}
         </AppProviders>
       </body>

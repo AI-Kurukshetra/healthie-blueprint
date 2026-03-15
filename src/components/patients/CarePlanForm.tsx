@@ -5,9 +5,10 @@ import { useRouter } from "next/navigation"
 import { useState, useTransition } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { toast } from "sonner"
-import { useForm } from "react-hook-form"
+import { Controller, useForm } from "react-hook-form"
 
 import { saveCarePlan } from "@/actions/care-plan"
+import { DatePicker } from "@/components/shared/DatePicker"
 import { LoadingButton } from "@/components/shared/LoadingButton"
 import { StatusBadge } from "@/components/shared/StatusBadge"
 import { Button } from "@/components/ui/button"
@@ -67,6 +68,7 @@ export function CarePlanForm({
     resolver: zodResolver(carePlanSchema),
   })
   const selectedStatus = form.watch("status")
+  const selectedStartDate = form.watch("start_date")
 
   const handleSubmit = (values: CarePlanInput, action: SubmitAction) => {
     setSubmitAction(action)
@@ -194,13 +196,34 @@ export function CarePlanForm({
           <div className="grid gap-5 md:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="care-plan-start-date">Start Date</Label>
-              <Input id="care-plan-start-date" type="date" {...form.register("start_date")} />
-              <FormMessage message={form.formState.errors.start_date?.message} />
+              <Controller
+                control={form.control}
+                name="start_date"
+                render={({ field, fieldState }) => (
+                  <DatePicker
+                    onChange={field.onChange}
+                    value={field.value}
+                    error={fieldState.error?.message}
+                  />
+                )}
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="care-plan-end-date">End Date</Label>
-              <Input id="care-plan-end-date" type="date" {...form.register("end_date")} />
-              <FormMessage message={form.formState.errors.end_date?.message} />
+              <Controller
+                control={form.control}
+                name="end_date"
+                render={({ field, fieldState }) => (
+                  <DatePicker
+                    allowClear
+                    minDate={selectedStartDate ? new Date(`${selectedStartDate}T00:00:00`) : undefined}
+                    onChange={field.onChange}
+                    placeholder="Select end date"
+                    value={field.value}
+                    error={fieldState.error?.message}
+                  />
+                )}
+              />
             </div>
           </div>
 
@@ -213,8 +236,8 @@ export function CarePlanForm({
                   className={cn(
                     "rounded-full px-4",
                     selectedStatus === option.value
-                      ? "bg-sky-500 text-white hover:bg-sky-600"
-                      : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                      ? "border-[rgba(0,212,184,0.45)] bg-[rgba(0,212,184,0.16)] text-[var(--teal-dark)] hover:bg-[rgba(0,212,184,0.22)]"
+                      : "border-slate-200 bg-slate-100 text-slate-600 hover:bg-slate-200"
                   )}
                   onClick={() =>
                     form.setValue("status", option.value, {
@@ -223,7 +246,7 @@ export function CarePlanForm({
                     })
                   }
                   type="button"
-                  variant="ghost"
+                  variant="secondary"
                 >
                   {option.label}
                 </Button>
@@ -250,12 +273,11 @@ export function CarePlanForm({
           loadingText="Saving..."
           onClick={form.handleSubmit((values) => handleSubmit(values, "draft"))}
           type="button"
-          variant="outline"
+          variant="secondary"
         >
           Save Draft
         </LoadingButton>
         <LoadingButton
-          className="bg-sky-500 text-white hover:bg-sky-600"
           isLoading={isPending && submitAction === "publish"}
           loadingText="Saving..."
           type="submit"

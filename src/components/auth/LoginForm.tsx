@@ -76,16 +76,16 @@ export function LoginForm() {
           <Input
             id="login-password"
             autoComplete="current-password"
-            className="pr-11"
+            className="pr-12"
             placeholder="Enter your password"
             type={showPassword ? "text" : "password"}
             {...form.register("password")}
           />
           <Button
             aria-label={showPassword ? "Hide password" : "Show password"}
-            className="absolute top-1/2 right-1 h-9 w-9 -translate-y-1/2 text-slate-500 hover:text-slate-700"
+            className="absolute top-1/2 right-1.5 h-8 w-8 -translate-y-1/2 text-[var(--text-hint)] hover:text-[var(--teal)]"
             onClick={() => setShowPassword((value) => !value)}
-            size="icon"
+            size="icon-xs"
             type="button"
             variant="ghost"
           >
@@ -95,10 +95,10 @@ export function LoginForm() {
         <FormMessage message={form.formState.errors.password?.message} />
       </div>
 
-      <FormMessage className="rounded-xl bg-rose-50 px-3 py-2" message={formError} />
+      {formError ? <div className="hf-alert-error">{formError}</div> : null}
 
       <LoadingButton
-        className="h-11 w-full rounded-xl bg-sky-500 text-white shadow-sm hover:bg-sky-600"
+        className="w-full"
         isLoading={isPending}
         loadingText="Signing in..."
         type="submit"
@@ -106,10 +106,10 @@ export function LoginForm() {
         Sign In
       </LoadingButton>
 
-      <p className="text-center text-sm text-slate-600">
+      <p className="text-center text-sm text-[var(--text-muted)]">
         Don&apos;t have an account?{" "}
         <Link
-          className="font-medium text-sky-600 transition hover:text-sky-700"
+          className="font-semibold text-[var(--teal-dark)] transition hover:text-[var(--teal)]"
           href="/register"
         >
           Register here

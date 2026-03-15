@@ -46,7 +46,7 @@ export function LabResultCard({ order }: { order: PatientLabListItem }) {
 
   return (
     <>
-      <article className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+      <article className="rounded-2xl border border-[var(--border)] bg-white p-5">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div className="space-y-2">
             <div className="flex flex-wrap items-center gap-2">
@@ -105,7 +105,7 @@ export function LabResultCard({ order }: { order: PatientLabListItem }) {
                 {order.status.replace("_", " ")}
               </Badge>
             </div>
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
+            <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4 text-sm text-slate-600">
               <p>Ordered: {formatDate(order.orderedAt)}</p>
               {order.reportedAt ? <p>Reported: {formatDate(order.reportedAt)}</p> : null}
               {order.instructions ? <p>Instructions: {order.instructions}</p> : null}
@@ -134,3 +134,4 @@ export function LabResultCard({ order }: { order: PatientLabListItem }) {
     </>
   )
 }
+

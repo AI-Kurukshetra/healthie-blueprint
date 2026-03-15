@@ -1,7 +1,7 @@
+import Link from "next/link"
 import {
   CalendarDays,
   FileText,
-  FlaskConical,
   MessageSquareMore,
   Users,
 } from "lucide-react"
@@ -10,6 +10,7 @@ import { AnalyticsCharts } from "@/components/dashboard/AnalyticsCharts"
 import { EmptyState } from "@/components/shared/EmptyState"
 import { StatusBadge } from "@/components/shared/StatusBadge"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import {
   getProviderDashboardData,
   getShellData,
@@ -20,87 +21,116 @@ import { formatDateTime, formatTime } from "@/lib/utils"
 const statCards = [
   {
     key: "totalPatients",
-    label: "Total Patients",
+    label: "Patients",
     icon: Users,
-    subtitle: "Accessible patient records",
+    accent: "bg-[var(--teal)]",
+    subtitle: "Active roster",
   },
   {
     key: "todaysAppointmentsCount",
-    label: "Today's Appointments",
+    label: "Appointments",
     icon: CalendarDays,
-    subtitle: "Scheduled for today",
+    accent: "bg-[#8B5CF6]",
+    subtitle: "Scheduled today",
   },
   {
     key: "pendingNotesCount",
-    label: "Pending Notes",
+    label: "Notes",
     icon: FileText,
-    subtitle: "Draft notes awaiting signature",
-  },
-  {
-    key: "pendingLabsCount",
-    label: "Pending Labs",
-    icon: FlaskConical,
-    subtitle: "Labs awaiting results",
+    accent: "bg-[#F59E0B]",
+    subtitle: "Awaiting signature",
   },
   {
     key: "unreadMessagesCount",
-    label: "Unread Messages",
+    label: "Messages",
     icon: MessageSquareMore,
-    subtitle: "New communication today",
+    accent: "bg-[#F43F5E]",
+    subtitle: "Unread threads",
   },
 ] as const
 
-function AppointmentSection({
+function QueueList({
   appointments,
-  description,
-  title,
 }: {
   appointments: Awaited<ReturnType<typeof getProviderDashboardData>>["todaysQueue"]
-  description: string
-  title: string
 }) {
   if (appointments.length === 0) {
     return (
-      <EmptyState
-        description={description}
-        title={`No ${title.toLowerCase()} yet`}
-      />
+      <div className="rounded-b-xl border border-t-0 border-[var(--border)] bg-white p-5">
+        <EmptyState
+          description="New appointments scheduled today will appear here."
+          title="Queue is clear"
+        />
+      </div>
     )
   }
 
   return (
-    <div className="space-y-3">
-      {appointments.map((appointment) => (
-        <article
-          key={appointment.id}
-          className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm"
-        >
-          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <div className="space-y-1">
-              <div className="flex flex-wrap items-center gap-2">
-                <h3 className="text-base font-semibold text-slate-950">
-                  {appointment.patientName}
-                </h3>
-                <Badge className="rounded-full border border-slate-200 bg-slate-50 text-slate-700">
-                  {appointment.patientId}
-                </Badge>
-              </div>
-              <p className="text-sm text-slate-600">
-                {appointment.reason || "General consultation"}
-              </p>
-              <p className="text-sm text-slate-500">
-                {title === "Today's Queue"
-                  ? formatTime(appointment.scheduledAt)
-                  : formatDateTime(appointment.scheduledAt)}
-              </p>
-            </div>
+    <div className="overflow-hidden rounded-b-xl border border-t-0 border-[var(--border)] bg-white">
+      {appointments.map((appointment) => {
+        const canJoin =
+          Boolean(appointment.meetingRoomId) &&
+          (appointment.status === "confirmed" || appointment.status === "in_progress")
 
-            <div className="flex flex-wrap items-center gap-2">
-              <StatusBadge value={appointment.status} />
-              <Badge className="rounded-full border border-slate-200 bg-white text-slate-700">
-                {appointment.type.replace("_", " ")}
-              </Badge>
+        return (
+          <article key={appointment.id} className="border-b border-[#F1F5F9] px-5 py-4 last:border-b-0">
+            <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+              <div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <p className="text-sm font-semibold text-[var(--navy)]">{appointment.patientName}</p>
+                  <Badge variant="outline">{appointment.patientId}</Badge>
+                </div>
+                <p className="mt-1 text-xs text-[var(--text-muted)]">{formatTime(appointment.scheduledAt)}</p>
+                <p className="mt-1 text-sm text-[var(--text-muted)]">{appointment.reason || "General consultation"}</p>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2">
+                <Badge variant="secondary">{appointment.type.replace("_", " ")}</Badge>
+                <StatusBadge value={appointment.status} />
+                {canJoin ? (
+                  <Link href={`/consultation/${appointment.meetingRoomId}`}>
+                    <Button size="sm" variant="join">Join Call</Button>
+                  </Link>
+                ) : (
+                  <Link href={`/appointments/${appointment.id}`}>
+                    <Button size="sm" variant="outline">View</Button>
+                  </Link>
+                )}
+              </div>
             </div>
+          </article>
+        )
+      })}
+    </div>
+  )
+}
+
+function UpcomingList({
+  appointments,
+}: {
+  appointments: Awaited<ReturnType<typeof getProviderDashboardData>>["upcomingAppointments"]
+}) {
+  if (appointments.length === 0) {
+    return (
+      <div className="rounded-b-xl border border-t-0 border-[var(--border)] bg-white p-5">
+        <EmptyState
+          description="Upcoming appointments beyond today will appear here."
+          title="No upcoming visits"
+        />
+      </div>
+    )
+  }
+
+  return (
+    <div className="overflow-hidden rounded-b-xl border border-t-0 border-[var(--border)] bg-white">
+      {appointments.slice(0, 6).map((appointment) => (
+        <article key={appointment.id} className="border-b border-[#F1F5F9] px-5 py-4 last:border-b-0">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <p className="text-sm font-semibold text-[var(--navy)]">{appointment.patientName}</p>
+              <p className="mt-1 text-xs text-[var(--text-muted)]">{formatDateTime(appointment.scheduledAt)}</p>
+            </div>
+            <StatusBadge value={appointment.status} />
           </div>
         </article>
       ))}
@@ -125,84 +155,58 @@ export default async function DashboardPage() {
     getProviderAnalytics(shell.provider.id),
   ])
 
+  const todayLabel = new Date().toLocaleDateString("en-US", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  })
+  const displayName = shell.profile.full_name.replace(/^Dr\.\s*/i, "")
+
   return (
-    <div className="space-y-6">
-      <section className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
-        <p className="text-sm font-medium text-sky-600">Care overview</p>
-        <h2 className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">
-          Welcome back, {shell.profile.full_name}
-        </h2>
-        <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600">
-          You have {dashboard.todaysAppointmentsCount} appointments scheduled today and{" "}
-          {dashboard.pendingNotesCount} notes waiting for review, plus{" "}
-          {dashboard.pendingLabsCount} labs awaiting results.
-        </p>
+    <div className="space-y-8">
+      <section className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+        <div>
+          <h1 className="hf-page-title">Good morning, Dr. {displayName}</h1>
+          <p className="mt-2 text-sm text-[var(--text-muted)]">Here&apos;s what&apos;s happening today.</p>
+        </div>
+        <p className="text-sm text-[var(--text-muted)]">{todayLabel}</p>
       </section>
 
-      <section className="grid grid-cols-2 gap-4 xl:grid-cols-5">
-        {statCards.map(({ icon: Icon, key, label, subtitle }) => (
-          <article
-            key={key}
-            className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm"
-          >
-            <div className="flex items-center gap-3">
-              <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-sky-50 text-sky-600">
-                <Icon className="h-5 w-5" />
-              </span>
-              <div>
-                <p className="text-sm font-medium text-slate-600">{label}</p>
-                <p className="text-2xl font-semibold text-slate-950">
-                  {dashboard[key]}
-                </p>
-              </div>
-            </div>
-            <p className="mt-4 text-xs text-slate-500">
-              {key === "pendingLabsCount"
-                ? `${dashboard.abnormalLabsCount} abnormal`
-                : subtitle}
-            </p>
+      <section className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+        {statCards.map(({ icon: Icon, key, label, accent, subtitle }) => (
+          <article key={key} className="relative overflow-hidden rounded-2xl border border-[var(--border)] bg-white p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.03)] transition-all duration-250 hover:-translate-y-0.5 hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)]">
+            <span className={`absolute top-0 left-0 h-full w-1 ${accent}`} />
+            <Icon className="pointer-events-none absolute top-5 right-5 h-10 w-10 text-[var(--navy)]/10" />
+            <p className="hf-label">{label}</p>
+            <p className="mt-2 font-display text-4xl font-bold text-[var(--navy)]">{dashboard[key]}</p>
+            <p className="mt-2 text-xs text-[var(--text-muted)]">{subtitle}</p>
           </article>
         ))}
       </section>
 
       <section className="grid gap-6 xl:grid-cols-2">
-        <div className="space-y-4">
-          <div>
-            <h3 className="text-lg font-semibold text-slate-950">Today&apos;s Queue</h3>
-            <p className="text-sm text-slate-500">
-              Active visits and check-ins scheduled for the current day.
-            </p>
+        <div>
+          <div className="flex items-center justify-between rounded-t-xl bg-[var(--navy)] px-5 py-4">
+            <p className="text-sm font-semibold text-white">Today&apos;s Queue</p>
+            <Badge className="bg-[var(--teal)] text-white">{dashboard.todaysQueue.length}</Badge>
           </div>
-          <AppointmentSection
-            appointments={dashboard.todaysQueue}
-            description="New appointments scheduled for today will appear here."
-            title="Today's Queue"
-          />
+          <QueueList appointments={dashboard.todaysQueue} />
         </div>
 
-        <div className="space-y-4">
-          <div>
-            <h3 className="text-lg font-semibold text-slate-950">
-              Upcoming Appointments
-            </h3>
-            <p className="text-sm text-slate-500">
-              The next visits on your calendar beyond today.
-            </p>
+        <div>
+          <div className="flex items-center justify-between rounded-t-xl bg-[var(--navy)] px-5 py-4">
+            <p className="text-sm font-semibold text-white">Upcoming</p>
+            <Badge className="bg-[var(--teal)] text-white">{dashboard.upcomingAppointments.length}</Badge>
           </div>
-          <AppointmentSection
-            appointments={dashboard.upcomingAppointments}
-            description="Future appointments will populate once new bookings are confirmed."
-            title="Upcoming Appointments"
-          />
+          <UpcomingList appointments={dashboard.upcomingAppointments} />
         </div>
       </section>
 
-      <section className="space-y-4">
-        <div>
-          <h3 className="text-lg font-semibold text-slate-950">Practice Analytics</h3>
-          <p className="text-sm text-slate-500">
-            Weekly booking trends and the most common patient conditions in your roster.
-          </p>
+      <section>
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="hf-section-title">Practice Analytics</h2>
+          <p className="text-sm text-[var(--text-muted)]">Weekly trends and top patient conditions</p>
         </div>
         <AnalyticsCharts
           appointmentsByDay={analytics.appointmentsByDay}

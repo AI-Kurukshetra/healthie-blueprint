@@ -2,13 +2,14 @@
 
 import { useEffect, useState, useTransition, type ReactNode } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
+import { Controller, useForm } from "react-hook-form"
 import { toast } from "sonner"
 
 import {
   addMedicationAction,
   updateMedicationAction,
 } from "@/actions/ehr"
+import { DatePicker } from "@/components/shared/DatePicker"
 import { LoadingButton } from "@/components/shared/LoadingButton"
 import { Button } from "@/components/ui/button"
 import {
@@ -118,7 +119,7 @@ export function MedicationEditorDialog({
 
   return (
     <Dialog onOpenChange={setOpen} open={open}>
-      <DialogTrigger render={<div>{triggerLabel}</div>} />
+      <DialogTrigger nativeButton={false} render={<div>{triggerLabel}</div>} />
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>{medication ? "Edit Medication" : "Add Medication"}</DialogTitle>
@@ -170,13 +171,38 @@ export function MedicationEditorDialog({
             </div>
             <div className="space-y-2">
               <Label htmlFor="medication-start-date">Start Date</Label>
-              <Input id="medication-start-date" type="date" {...form.register("start_date")} />
-              <FormMessage message={form.formState.errors.start_date?.message} />
+              <Controller
+                control={form.control}
+                name="start_date"
+                render={({ field, fieldState }) => (
+                  <DatePicker
+                    onChange={field.onChange}
+                    value={field.value}
+                    error={fieldState.error?.message}
+                  />
+                )}
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="medication-end-date">End Date</Label>
-              <Input id="medication-end-date" type="date" {...form.register("end_date")} />
-              <FormMessage message={form.formState.errors.end_date?.message} />
+              <Controller
+                control={form.control}
+                name="end_date"
+                render={({ field, fieldState }) => (
+                  <DatePicker
+                    allowClear
+                    minDate={
+                      form.watch("start_date")
+                        ? new Date(`${form.watch("start_date")}T00:00:00`)
+                        : undefined
+                    }
+                    onChange={field.onChange}
+                    placeholder="Select end date"
+                    value={field.value}
+                    error={fieldState.error?.message}
+                  />
+                )}
+              />
             </div>
           </div>
 
@@ -199,11 +225,10 @@ export function MedicationEditorDialog({
           ) : null}
 
           <DialogFooter>
-            <Button onClick={() => setOpen(false)} type="button" variant="outline">
+            <Button onClick={() => setOpen(false)} type="button" variant="ghost">
               Cancel
             </Button>
             <LoadingButton
-              className="bg-sky-500 text-white hover:bg-sky-600"
               isLoading={isPending}
               loadingText={medication ? "Saving..." : "Adding..."}
               type="submit"

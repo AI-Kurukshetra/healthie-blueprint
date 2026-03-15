@@ -2,13 +2,14 @@
 
 import { useEffect, useState, useTransition, type ReactNode } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
+import { Controller, useForm } from "react-hook-form"
 import { toast } from "sonner"
 
 import {
   addMedicalHistoryAction,
   updateMedicalHistoryAction,
 } from "@/actions/ehr"
+import { DatePicker } from "@/components/shared/DatePicker"
 import { LoadingButton } from "@/components/shared/LoadingButton"
 import { Button } from "@/components/ui/button"
 import {
@@ -117,7 +118,7 @@ export function HistoryEditorDialog({
 
   return (
     <Dialog onOpenChange={setOpen} open={open}>
-      <DialogTrigger render={<div>{triggerLabel}</div>} />
+      <DialogTrigger nativeButton={false} render={<div>{triggerLabel}</div>} />
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>{record ? "Edit History Record" : "Add History Record"}</DialogTitle>
@@ -171,8 +172,17 @@ export function HistoryEditorDialog({
           <div className="grid gap-4 md:grid-cols-[1fr_auto] md:items-end">
             <div className="space-y-2">
               <Label htmlFor="history-date">Date Occurred</Label>
-              <Input id="history-date" type="date" {...form.register("date_occurred")} />
-              <FormMessage message={form.formState.errors.date_occurred?.message} />
+              <Controller
+                control={form.control}
+                name="date_occurred"
+                render={({ field, fieldState }) => (
+                  <DatePicker
+                    onChange={field.onChange}
+                    value={field.value}
+                    error={fieldState.error?.message}
+                  />
+                )}
+              />
             </div>
             <label className="flex items-center gap-2 rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-700">
               <input type="checkbox" {...form.register("is_resolved")} />
@@ -187,11 +197,10 @@ export function HistoryEditorDialog({
           ) : null}
 
           <DialogFooter>
-            <Button onClick={() => setOpen(false)} type="button" variant="outline">
+            <Button onClick={() => setOpen(false)} type="button" variant="ghost">
               Cancel
             </Button>
             <LoadingButton
-              className="bg-sky-500 text-white hover:bg-sky-600"
               isLoading={isPending}
               loadingText={record ? "Saving..." : "Adding..."}
               type="submit"

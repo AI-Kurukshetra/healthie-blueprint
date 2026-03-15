@@ -139,7 +139,6 @@ export function PatientPendingConfirmationSection({
 
               <div className="flex flex-wrap gap-2">
                 <LoadingButton
-                  className="bg-emerald-600 text-white hover:bg-emerald-700"
                   isLoading={isPending && pendingAction === `confirm:${appointment.id}`}
                   loadingText="Confirming..."
                   onClick={() => handleConfirm(appointment.id)}
@@ -149,14 +148,13 @@ export function PatientPendingConfirmationSection({
                   Confirm
                 </LoadingButton>
                 <Button
-                  className="border-rose-200 text-rose-600 hover:bg-rose-50"
                   onClick={() => {
                     setFormError(undefined)
                     setDeclineReason("")
                     setActiveDeclineId(appointment.id)
                   }}
                   type="button"
-                  variant="outline"
+                  variant="destructive"
                 >
                   <X className="h-4 w-4" />
                   Decline
@@ -210,16 +208,16 @@ export function PatientPendingConfirmationSection({
                 setFormError(undefined)
               }}
               type="button"
-              variant="outline"
+              variant="ghost"
             >
               Cancel
             </Button>
             <LoadingButton
-              className="bg-rose-600 text-white hover:bg-rose-700"
               isLoading={Boolean(activeDeclineId) && isPending}
               loadingText="Declining..."
               onClick={handleDecline}
               type="button"
+              variant="destructive"
             >
               Confirm Decline
             </LoadingButton>

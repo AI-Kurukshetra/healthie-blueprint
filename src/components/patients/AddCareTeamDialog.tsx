@@ -74,6 +74,9 @@ export function AddCareTeamDialog({
     const haystack = `${provider.fullName} ${provider.specialty} ${provider.email}`.toLowerCase()
     return haystack.includes(query.trim().toLowerCase())
   })
+  const selectedProviderId = form.watch("provider_id")
+  const selectedProvider =
+    availableProviders.find((provider) => provider.providerId === selectedProviderId) ?? null
 
   const onSubmit = (values: CareTeamInput) => {
     startTransition(async () => {
@@ -109,11 +112,7 @@ export function AddCareTeamDialog({
 
   return (
     <Dialog onOpenChange={setOpen} open={open}>
-      <DialogTrigger
-        render={
-          <Button className="rounded-xl bg-sky-500 px-4 text-white hover:bg-sky-600" />
-        }
-      >
+      <DialogTrigger render={<Button />}>
         <Plus className="h-4 w-4" />
         Add Provider
       </DialogTrigger>
@@ -153,7 +152,17 @@ export function AddCareTeamDialog({
                 render={({ field }) => (
                   <Select onValueChange={field.onChange} value={field.value}>
                     <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select a provider" />
+                      <span
+                        className={
+                          selectedProvider
+                            ? "flex flex-1 text-left"
+                            : "flex flex-1 text-left text-muted-foreground"
+                        }
+                      >
+                        {selectedProvider
+                          ? `${selectedProvider.fullName} - ${selectedProvider.specialty}`
+                          : "Select a provider"}
+                      </span>
                     </SelectTrigger>
                     <SelectContent>
                       {filteredProviders.length === 0 ? (
@@ -200,11 +209,10 @@ export function AddCareTeamDialog({
             <input type="hidden" {...form.register("patient_id")} value={patientId} />
 
             <DialogFooter>
-              <Button onClick={() => setOpen(false)} type="button" variant="outline">
+              <Button onClick={() => setOpen(false)} type="button" variant="ghost">
                 Cancel
               </Button>
               <LoadingButton
-                className="bg-sky-500 text-white hover:bg-sky-600"
                 isLoading={isPending}
                 loadingText="Adding..."
                 type="submit"

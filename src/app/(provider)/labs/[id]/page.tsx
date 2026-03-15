@@ -27,7 +27,7 @@ export default async function LabOrderDetailPage({
           <UploadResultDialog
             order={order}
             triggerLabel={
-              <Button className="bg-sky-500 text-white hover:bg-sky-600">
+              <Button>
                 Upload Result
               </Button>
             }

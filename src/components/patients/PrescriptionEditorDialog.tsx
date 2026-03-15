@@ -2,10 +2,11 @@
 
 import { useEffect, useState, useTransition, type ReactNode } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useFieldArray, useForm } from "react-hook-form"
+import { Controller, useFieldArray, useForm } from "react-hook-form"
 import { toast } from "sonner"
 
 import { issuePrescriptionAction } from "@/actions/ehr"
+import { DatePicker } from "@/components/shared/DatePicker"
 import { LoadingButton } from "@/components/shared/LoadingButton"
 import { Button } from "@/components/ui/button"
 import {
@@ -25,7 +26,6 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import type { EHRAppointmentOption } from "@/lib/data/ehr"
@@ -33,6 +33,7 @@ import {
   prescriptionSchema,
   type PrescriptionInput,
 } from "@/lib/validations/ehr"
+import { cn } from "@/lib/utils"
 
 function getDefaultValues(): PrescriptionInput {
   const expiry = new Date()
@@ -80,6 +81,12 @@ export function PrescriptionEditorDialog({
     control: form.control,
     name: "medications",
   })
+  const selectedAppointmentId = form.watch("appointment_id")
+  const selectedAppointmentLabel =
+    !selectedAppointmentId
+      ? "No appointment linked"
+      : appointments.find((appointment) => appointment.id === selectedAppointmentId)?.label ??
+        "No appointment linked"
 
   useEffect(() => {
     if (open) {
@@ -119,7 +126,7 @@ export function PrescriptionEditorDialog({
 
   return (
     <Dialog onOpenChange={setOpen} open={open}>
-      <DialogTrigger render={<div>{triggerLabel}</div>} />
+      <DialogTrigger nativeButton={false} render={<div>{triggerLabel}</div>} />
       <DialogContent className="max-w-4xl">
         <DialogHeader>
           <DialogTitle>Issue Prescription</DialogTitle>
@@ -151,12 +158,25 @@ export function PrescriptionEditorDialog({
                 value={form.watch("appointment_id") || "__none__"}
               >
                 <SelectTrigger id="rx-appointment">
-                  <SelectValue placeholder="Optional appointment" />
+                  <span
+                    className={cn(
+                      "flex flex-1 text-left",
+                      !selectedAppointmentLabel && "text-muted-foreground"
+                    )}
+                  >
+                    {selectedAppointmentLabel || "Optional appointment"}
+                  </span>
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="__none__">No appointment linked</SelectItem>
+                <SelectContent align="start" className="min-w-[22rem]">
+                  <SelectItem label="No appointment linked" value="__none__">
+                    No appointment linked
+                  </SelectItem>
                   {appointments.map((appointment) => (
-                    <SelectItem key={appointment.id} value={appointment.id}>
+                    <SelectItem
+                      key={appointment.id}
+                      label={appointment.label}
+                      value={appointment.id}
+                    >
                       {appointment.label}
                     </SelectItem>
                   ))}
@@ -166,8 +186,18 @@ export function PrescriptionEditorDialog({
             </div>
             <div className="space-y-2">
               <Label htmlFor="rx-expires">Expires</Label>
-              <Input id="rx-expires" type="date" {...form.register("expires_at")} />
-              <FormMessage message={form.formState.errors.expires_at?.message} />
+              <Controller
+                control={form.control}
+                name="expires_at"
+                render={({ field, fieldState }) => (
+                  <DatePicker
+                    minDate={new Date()}
+                    onChange={field.onChange}
+                    value={field.value}
+                    error={fieldState.error?.message}
+                  />
+                )}
+              />
             </div>
           </div>
 
@@ -259,11 +289,10 @@ export function PrescriptionEditorDialog({
           ) : null}
 
           <DialogFooter>
-            <Button onClick={() => setOpen(false)} type="button" variant="outline">
+            <Button onClick={() => setOpen(false)} type="button" variant="ghost">
               Cancel
             </Button>
             <LoadingButton
-              className="bg-sky-500 text-white hover:bg-sky-600"
               isLoading={isPending}
               loadingText="Issuing..."
               type="submit"

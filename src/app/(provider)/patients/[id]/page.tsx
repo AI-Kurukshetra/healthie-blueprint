@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { ChevronLeft } from "lucide-react"
 import { notFound } from "next/navigation"
 
 import { LabOrderList } from "@/components/labs/LabOrderList"
@@ -37,90 +38,101 @@ export default async function PatientDetailPage({
 
   return (
     <div className="space-y-6">
-      <section className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
+      <div>
+        <Link
+          className="inline-flex items-center gap-1 text-sm font-medium text-[var(--teal-dark)] transition hover:text-[var(--teal)]"
+          href="/patients"
+        >
+          <ChevronLeft className="h-4 w-4" />
+          Patients / {patient.fullName}
+        </Link>
+      </div>
+
+      <section className="rounded-[20px] border border-[var(--border)] bg-white p-7 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.03)]">
         <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex items-start gap-4">
-            <Avatar size="lg">
+            <Avatar className="h-16 w-16" size="lg">
               <AvatarImage alt={patient.fullName} src={patient.avatarUrl ?? undefined} />
               <AvatarFallback>{getInitials(patient.fullName)}</AvatarFallback>
             </Avatar>
             <div className="space-y-2">
               <div className="flex flex-wrap items-center gap-2">
-                <h2 className="text-2xl font-semibold text-slate-950">
-                  {patient.fullName}
-                </h2>
-                <Badge className="rounded-full border border-slate-200 bg-slate-50 text-slate-700">
-                  {patient.patientId}
-                </Badge>
+                <h1 className="text-3xl font-bold text-[var(--navy)]">{patient.fullName}</h1>
                 <StatusBadge value={patient.status} />
               </div>
-              <p className="text-sm text-slate-600">{patient.email}</p>
+              <p className="text-sm text-[var(--text-muted)]">
+                {patient.patientId} {"  "}
+                {patient.age ? `| ${patient.age} years` : ""}
+                {patient.bloodGroup ? ` | Blood Group: ${patient.bloodGroup}` : ""}
+              </p>
+              <p className="text-sm text-[var(--text-muted)]">{patient.email}</p>
             </div>
           </div>
           <div className="flex flex-wrap gap-2">
             <Link href={`/patients/${patient.id}/edit`}>
-              <Button variant="outline">Edit</Button>
+              <Button variant="outline">Edit Patient</Button>
             </Link>
             <Link href={`/notes/new?patient=${patient.id}`}>
-              <Button variant="outline">Add Note</Button>
+              <Button>Add Note</Button>
             </Link>
-            <Link href={`/appointments?patient=${patient.id}`}>
-              <Button variant="outline">Open Appointments</Button>
-            </Link>
-            <Link href={`/patients/${patient.id}/ehr`}>
-              <Button variant="outline">Open EHR</Button>
+            <Link href={`/patients/${patient.id}/care-plan`}>
+              <Button variant="outline">Care Plan</Button>
             </Link>
             <DeletePatientButton patientId={patient.id} />
           </div>
         </div>
       </section>
 
-      <section className="grid gap-4 xl:grid-cols-4">
-        <article className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
-          <h3 className="font-semibold text-slate-950">Personal Info</h3>
-          <div className="mt-4 space-y-2 text-sm text-slate-600">
-            <p>Phone: {patient.phone ?? "--"}</p>
-            <p>DOB: {patient.dateOfBirth ? formatDate(patient.dateOfBirth) : "--"}</p>
-            <p>Gender: {patient.gender ?? "--"}</p>
-            <p>Age: {patient.age ?? "--"}</p>
+      <section className="grid gap-4 md:grid-cols-2">
+        <article className="rounded-2xl border border-[var(--border)] bg-white p-6">
+          <div className="mb-4 flex items-center gap-2 border-b border-[#F1F5F9] pb-3">
+            <h3 className="hf-card-title">Personal Info</h3>
+          </div>
+          <div className="space-y-3 text-sm">
+            <div className="flex items-center justify-between"><span className="hf-label">Phone</span><span>{patient.phone ?? "--"}</span></div>
+            <div className="flex items-center justify-between"><span className="hf-label">DOB</span><span>{patient.dateOfBirth ? formatDate(patient.dateOfBirth) : "--"}</span></div>
+            <div className="flex items-center justify-between"><span className="hf-label">Gender</span><span>{patient.gender ?? "--"}</span></div>
+            <div className="flex items-center justify-between"><span className="hf-label">Age</span><span>{patient.age ?? "--"}</span></div>
           </div>
         </article>
-        <article className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
-          <h3 className="font-semibold text-slate-950">Medical Summary</h3>
-          <div className="mt-4 space-y-2 text-sm text-slate-600">
-            <p>Blood group: {patient.bloodGroup ?? "--"}</p>
-            <p>
-              Allergies: {patient.allergies.length > 0 ? patient.allergies.join(", ") : "--"}
-            </p>
-            <p>
-              Conditions:{" "}
-              {patient.chronicConditions.length > 0
-                ? patient.chronicConditions.join(", ")
-                : "--"}
-            </p>
+
+        <article className="rounded-2xl border border-[var(--border)] bg-white p-6">
+          <div className="mb-4 flex items-center gap-2 border-b border-[#F1F5F9] pb-3">
+            <h3 className="hf-card-title">Medical Summary</h3>
+          </div>
+          <div className="space-y-3 text-sm">
+            <div className="flex items-center justify-between"><span className="hf-label">Blood Group</span><span>{patient.bloodGroup ?? "--"}</span></div>
+            <div className="space-y-1"><p className="hf-label">Allergies</p><p className="text-[var(--text-muted)]">{patient.allergies.length > 0 ? patient.allergies.join(", ") : "--"}</p></div>
+            <div className="space-y-1"><p className="hf-label">Conditions</p><p className="text-[var(--text-muted)]">{patient.chronicConditions.length > 0 ? patient.chronicConditions.join(", ") : "--"}</p></div>
           </div>
         </article>
-        <article className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
-          <h3 className="font-semibold text-slate-950">Insurance & Emergency</h3>
-          <div className="mt-4 space-y-2 text-sm text-slate-600">
-            <p>Insurance: {patient.insuranceProvider ?? "--"}</p>
-            <p>Insurance ID: {patient.insuranceId ?? "--"}</p>
-            <p>Emergency contact: {patient.emergencyContact ?? "--"}</p>
-            <p>Emergency phone: {patient.emergencyPhone ?? "--"}</p>
+
+        <article className="rounded-2xl border border-[var(--border)] bg-white p-6">
+          <div className="mb-4 flex items-center gap-2 border-b border-[#F1F5F9] pb-3">
+            <h3 className="hf-card-title">Insurance & Emergency</h3>
+          </div>
+          <div className="space-y-3 text-sm">
+            <div className="flex items-center justify-between"><span className="hf-label">Insurance</span><span>{patient.insuranceProvider ?? "--"}</span></div>
+            <div className="flex items-center justify-between"><span className="hf-label">Insurance ID</span><span>{patient.insuranceId ?? "--"}</span></div>
+            <div className="flex items-center justify-between"><span className="hf-label">Emergency Contact</span><span>{patient.emergencyContact ?? "--"}</span></div>
+            <div className="flex items-center justify-between"><span className="hf-label">Emergency Phone</span><span>{patient.emergencyPhone ?? "--"}</span></div>
           </div>
         </article>
-        <article className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
-          <h3 className="font-semibold text-slate-950">Activity</h3>
-          <div className="mt-4 space-y-2 text-sm text-slate-600">
-            <p>Last visit: {patient.lastVisit ? formatDate(patient.lastVisit) : "--"}</p>
-            <p>Appointments: {patient.appointments.length}</p>
-            <p>Clinical notes: {patient.notes.length}</p>
-            <p>Messages: {patient.messages.length}</p>
+
+        <article className="rounded-2xl border border-[var(--border)] bg-white p-6">
+          <div className="mb-4 flex items-center gap-2 border-b border-[#F1F5F9] pb-3">
+            <h3 className="hf-card-title">Activity</h3>
+          </div>
+          <div className="space-y-3 text-sm">
+            <div className="flex items-center justify-between"><span className="hf-label">Last Visit</span><span>{patient.lastVisit ? formatDate(patient.lastVisit) : "--"}</span></div>
+            <div className="flex items-center justify-between"><span className="hf-label">Appointments</span><span>{patient.appointments.length}</span></div>
+            <div className="flex items-center justify-between"><span className="hf-label">Clinical Notes</span><span>{patient.notes.length}</span></div>
+            <div className="flex items-center justify-between"><span className="hf-label">Messages</span><span>{patient.messages.length}</span></div>
           </div>
         </article>
       </section>
 
-      <section className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
+      <section className="hf-card">
         <Tabs defaultValue="overview">
           <TabsList variant="line">
             <TabsTrigger value="overview">Overview</TabsTrigger>
@@ -136,60 +148,26 @@ export default async function PatientDetailPage({
 
           <TabsContent className="pt-6" value="overview">
             <div className="grid gap-6 xl:grid-cols-[1fr_0.9fr]">
-              <article className="rounded-3xl border border-slate-200 bg-slate-50 p-5">
-                <h3 className="text-lg font-semibold text-slate-950">Health Summary</h3>
-                <div className="mt-4 space-y-3 text-sm text-slate-600">
+              <article className="rounded-2xl border border-[var(--border)] bg-[#F8FAFC] p-5">
+                <h3 className="hf-card-title">Health Summary</h3>
+                <div className="mt-4 space-y-3 text-sm text-[var(--text-muted)]">
                   <p>
                     Active Medications: {ehrSummary.activeMedicationCount}{" "}
-                    <Link className="font-medium text-sky-600" href={`/patients/${patient.id}/ehr`}>
+                    <Link className="font-medium text-[var(--teal-dark)]" href={`/patients/${patient.id}/ehr`}>
                       Open EHR
                     </Link>
                   </p>
-                  <div className="space-y-2">
-                    <p>Known Allergies</p>
-                    <div className="flex flex-wrap gap-2">
-                      {patient.allergies.length > 0 ? (
-                        patient.allergies.map((item) => (
-                          <Badge
-                            key={item}
-                            className="rounded-full border border-rose-200 bg-rose-50 text-rose-700"
-                          >
-                            {item}
-                          </Badge>
-                        ))
-                      ) : (
-                        <p className="text-slate-500">None</p>
-                      )}
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <p>Chronic Conditions</p>
-                    <div className="flex flex-wrap gap-2">
-                      {patient.chronicConditions.length > 0 ? (
-                        patient.chronicConditions.map((item) => (
-                          <Badge
-                            key={item}
-                            className="rounded-full border border-amber-200 bg-amber-50 text-amber-700"
-                          >
-                            {item}
-                          </Badge>
-                        ))
-                      ) : (
-                        <p className="text-slate-500">None</p>
-                      )}
-                    </div>
-                  </div>
                   <p>
                     Last Prescription:{" "}
                     {ehrSummary.lastPrescription
-                      ? `${ehrSummary.lastPrescription.rxNumber} • ${formatDate(ehrSummary.lastPrescription.issuedAt)}`
+                      ? `${ehrSummary.lastPrescription.rxNumber} | ${formatDate(ehrSummary.lastPrescription.issuedAt)}`
                       : "None"}
                   </p>
                 </div>
               </article>
 
-              <article className="rounded-3xl border border-slate-200 bg-slate-50 p-5">
-                <h3 className="text-lg font-semibold text-slate-950">Quick Links</h3>
+              <article className="rounded-2xl border border-[var(--border)] bg-[#F8FAFC] p-5">
+                <h3 className="hf-card-title">Quick Links</h3>
                 <div className="mt-4 flex flex-wrap gap-2">
                   <Link href={`/patients/${patient.id}/ehr`}>
                     <Button variant="outline">Open EHR</Button>
@@ -206,43 +184,29 @@ export default async function PatientDetailPage({
           </TabsContent>
 
           <TabsContent className="pt-6" value="ehr">
-            <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5">
-              <h3 className="text-lg font-semibold text-slate-950">Electronic Health Record</h3>
-              <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
-                Open the full EHR workspace to manage medications, medical history,
-                prescriptions, and allergies for this patient.
+            <div className="rounded-2xl border border-[var(--border)] bg-[#F8FAFC] p-5">
+              <h3 className="hf-card-title">Electronic Health Record</h3>
+              <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--text-muted)]">
+                Open the full EHR workspace to manage medications, medical history, prescriptions, and allergies for this patient.
               </p>
-              <Link
-                className="mt-4 inline-flex h-10 items-center justify-center rounded-xl border border-slate-200 bg-white px-4 text-sm font-medium text-slate-700 transition hover:border-sky-200 hover:text-sky-700"
-                href={`/patients/${patient.id}/ehr`}
-              >
-                Open EHR Workspace
+              <Link className="mt-4 inline-block" href={`/patients/${patient.id}/ehr`}>
+                <Button variant="outline">Open EHR Workspace</Button>
               </Link>
             </div>
           </TabsContent>
 
           <TabsContent className="pt-6" value="notes">
             {patient.notes.length === 0 ? (
-              <EmptyState
-                description="Clinical notes for this patient will appear here."
-                title="No clinical notes yet"
-              />
+              <EmptyState description="Clinical notes for this patient will appear here." title="No clinical notes yet" />
             ) : (
               <div className="space-y-3">
                 {patient.notes.map((note) => (
-                  <article
-                    key={note.id}
-                    className="rounded-2xl border border-slate-200 p-4"
-                  >
+                  <article key={note.id} className="rounded-xl border border-[var(--border)] p-4">
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <div>
-                        <p className="font-medium text-slate-950">
-                          {formatDate(note.createdAt)}
-                        </p>
-                        <p className="mt-1 text-sm text-slate-600">
-                          {note.diagnosisCodes.length > 0
-                            ? note.diagnosisCodes.join(", ")
-                            : "No diagnosis code"}
+                        <p className="font-medium text-[var(--navy)]">{formatDate(note.createdAt)}</p>
+                        <p className="mt-1 text-sm text-[var(--text-muted)]">
+                          {note.diagnosisCodes.length > 0 ? note.diagnosisCodes.join(", ") : "No diagnosis code"}
                         </p>
                       </div>
                       <StatusBadge value={note.status} />
@@ -255,30 +219,20 @@ export default async function PatientDetailPage({
 
           <TabsContent className="pt-6" value="appointments">
             {patient.appointments.length === 0 ? (
-              <EmptyState
-                description="Appointments for this patient will appear here."
-                title="No appointments yet"
-              />
+              <EmptyState description="Appointments for this patient will appear here." title="No appointments yet" />
             ) : (
               <div className="space-y-3">
                 {patient.appointments.map((appointment) => (
-                  <article
-                    key={appointment.id}
-                    className="rounded-2xl border border-slate-200 p-4"
-                  >
+                  <article key={appointment.id} className="rounded-xl border border-[var(--border)] p-4">
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <div>
-                        <p className="font-medium text-slate-950">
-                          {formatDateTime(appointment.scheduledAt)}
-                        </p>
-                        <p className="mt-1 text-sm text-slate-600">
+                        <p className="font-medium text-[var(--navy)]">{formatDateTime(appointment.scheduledAt)}</p>
+                        <p className="mt-1 text-sm text-[var(--text-muted)]">
                           {appointment.reason || "Consultation"} | {appointment.duration} min
                         </p>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Badge className="rounded-full border border-slate-200 bg-slate-50 text-slate-700">
-                          {appointment.type.replace("_", " ")}
-                        </Badge>
+                        <Badge variant="secondary">{appointment.type.replace("_", " ")}</Badge>
                         <StatusBadge value={appointment.status} />
                       </div>
                     </div>
@@ -292,9 +246,7 @@ export default async function PatientDetailPage({
             <LabOrderList
               appointments={patient.appointments.map((appointment) => ({
                 id: appointment.id,
-                label: `${formatDateTime(appointment.scheduledAt)} - ${
-                  appointment.reason || "Consultation"
-                }`,
+                label: `${formatDateTime(appointment.scheduledAt)} - ${appointment.reason || "Consultation"}`,
                 patientId: patient.id,
               }))}
               description="Order tests and review results linked to this patient."
@@ -316,26 +268,16 @@ export default async function PatientDetailPage({
 
           <TabsContent className="pt-6" value="messages">
             {patient.messages.length === 0 ? (
-              <EmptyState
-                description="Messages related to this patient will appear here."
-                title="No messages yet"
-              />
+              <EmptyState description="Messages related to this patient will appear here." title="No messages yet" />
             ) : (
               <div className="space-y-3">
                 {patient.messages.map((message) => (
-                  <article
-                    key={message.id}
-                    className="rounded-2xl border border-slate-200 p-4"
-                  >
+                  <article key={message.id} className="rounded-xl border border-[var(--border)] p-4">
                     <div className="flex flex-wrap items-center justify-between gap-3">
-                      <p className="font-medium text-slate-950">{message.senderLabel}</p>
-                      <p className="text-xs text-slate-500">
-                        {formatRelativeTime(message.createdAt)}
-                      </p>
+                      <p className="font-medium text-[var(--navy)]">{message.senderLabel}</p>
+                      <p className="text-xs text-[var(--text-muted)]">{formatRelativeTime(message.createdAt)}</p>
                     </div>
-                    <p className="mt-2 text-sm leading-6 text-slate-600">
-                      {message.content}
-                    </p>
+                    <p className="mt-2 text-sm leading-6 text-[var(--text-muted)]">{message.content}</p>
                   </article>
                 ))}
               </div>
@@ -343,48 +285,37 @@ export default async function PatientDetailPage({
           </TabsContent>
 
           <TabsContent className="pt-6" value="timeline">
-            <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5">
-              <h3 className="text-lg font-semibold text-slate-950">Patient Timeline</h3>
-              <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
-                Open the longitudinal timeline to review appointments, SOAP notes, and
-                signed records in one place.
+            <div className="rounded-2xl border border-[var(--border)] bg-[#F8FAFC] p-5">
+              <h3 className="hf-card-title">Patient Timeline</h3>
+              <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--text-muted)]">
+                Open the longitudinal timeline to review appointments, SOAP notes, and signed records in one place.
               </p>
-              <Link
-                className="mt-4 inline-flex h-10 items-center justify-center rounded-xl border border-slate-200 bg-white px-4 text-sm font-medium text-slate-700 transition hover:border-sky-200 hover:text-sky-700"
-                href={`/patients/${patient.id}/timeline`}
-              >
-                Open Timeline
+              <Link className="mt-4 inline-block" href={`/patients/${patient.id}/timeline`}>
+                <Button variant="outline">Open Timeline</Button>
               </Link>
             </div>
           </TabsContent>
 
           <TabsContent className="pt-6" value="care-team">
-            <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5">
-              <h3 className="text-lg font-semibold text-slate-950">Care Team</h3>
-              <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
+            <div className="rounded-2xl border border-[var(--border)] bg-[#F8FAFC] p-5">
+              <h3 className="hf-card-title">Care Team</h3>
+              <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--text-muted)]">
                 Assign specialists, consultants, and supporting providers to this patient.
               </p>
-              <Link
-                className="mt-4 inline-flex h-10 items-center justify-center rounded-xl border border-slate-200 bg-white px-4 text-sm font-medium text-slate-700 transition hover:border-sky-200 hover:text-sky-700"
-                href={`/patients/${patient.id}/care-team`}
-              >
-                Manage Care Team
+              <Link className="mt-4 inline-block" href={`/patients/${patient.id}/care-team`}>
+                <Button variant="outline">Manage Care Team</Button>
               </Link>
             </div>
           </TabsContent>
 
           <TabsContent className="pt-6" value="care-plan">
-            <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5">
-              <h3 className="text-lg font-semibold text-slate-950">Care Plan</h3>
-              <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
-                Create or update a structured treatment plan with goals, follow-up,
-                exercise, and nutrition guidance.
+            <div className="rounded-2xl border border-[var(--border)] bg-[#F8FAFC] p-5">
+              <h3 className="hf-card-title">Care Plan</h3>
+              <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--text-muted)]">
+                Create or update a structured treatment plan with goals, follow-up, exercise, and nutrition guidance.
               </p>
-              <Link
-                className="mt-4 inline-flex h-10 items-center justify-center rounded-xl border border-slate-200 bg-white px-4 text-sm font-medium text-slate-700 transition hover:border-sky-200 hover:text-sky-700"
-                href={`/patients/${patient.id}/care-plan`}
-              >
-                Open Care Plan
+              <Link className="mt-4 inline-block" href={`/patients/${patient.id}/care-plan`}>
+                <Button variant="outline">Open Care Plan</Button>
               </Link>
             </div>
           </TabsContent>

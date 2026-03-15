@@ -20,9 +20,9 @@ export default async function PortalRecordsPage() {
 
   return (
     <div className="space-y-6">
-      <section className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
-        <h2 className="text-2xl font-semibold text-slate-950">My Records</h2>
-        <p className="mt-2 text-sm text-slate-600">
+      <section className="hf-card">
+        <h2 className="hf-page-title">My Records</h2>
+        <p className="mt-2 text-sm text-[var(--text-muted)]">
           Signed clinical notes and diagnoses shared with your account.
         </p>
       </section>
@@ -37,7 +37,7 @@ export default async function PortalRecordsPage() {
           {records.map((record) => (
             <article
               key={record.id}
-              className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm"
+              className="rounded-2xl border border-[var(--border)] bg-white p-5"
             >
               <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                 <div className="space-y-2">
@@ -52,13 +52,13 @@ export default async function PortalRecordsPage() {
                       record.diagnosisCodes.map((code) => (
                         <Badge
                           key={code}
-                          className="rounded-full border border-slate-200 bg-slate-50 text-slate-700"
+                          className="rounded-full bg-[var(--surface)] text-[var(--text-muted)]"
                         >
                           {code}
                         </Badge>
                       ))
                     ) : (
-                      <Badge className="rounded-full border border-slate-200 bg-slate-50 text-slate-700">
+                      <Badge className="rounded-full bg-[var(--surface)] text-[var(--text-muted)]">
                         No diagnosis code
                       </Badge>
                     )}
@@ -73,3 +73,4 @@ export default async function PortalRecordsPage() {
     </div>
   )
 }
+

@@ -12,10 +12,10 @@ export default async function PatientLayout({
   const shell = await getShellData("patient")
 
   return (
-    <div className="min-h-screen bg-slate-100">
+    <div className="min-h-screen bg-[var(--surface)]">
       <div className="flex min-h-screen">
-        <aside className="hidden w-[260px] border-r border-slate-200 bg-white md:block">
-          <PatientSidebar patientId={shell.patient?.patient_id} />
+        <aside className="hidden w-[260px] border-r border-[rgba(0,212,184,0.2)] bg-[linear-gradient(160deg,#021a12_0%,#011209_60%,#021510_100%)] md:block">
+          <PatientSidebar fullName={shell.profile.full_name} patientId={shell.patient?.patient_id} />
         </aside>
 
         <div className="flex min-h-screen min-w-0 flex-1 flex-col">
@@ -28,7 +28,7 @@ export default async function PatientLayout({
             patientId={shell.patient?.patient_id}
             role="patient"
           />
-          <main className="flex-1 p-4 md:p-6">{children}</main>
+          <main className="flex-1 p-4 md:p-8">{children}</main>
         </div>
       </div>
     </div>

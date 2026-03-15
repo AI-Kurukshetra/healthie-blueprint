@@ -1,7 +1,7 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import { useState, useTransition } from "react"
+import { useState, useTransition, type ReactElement } from "react"
 import { AlertTriangle } from "lucide-react"
 import { toast } from "sonner"
 
@@ -20,9 +20,10 @@ import {
 
 type DeletePatientButtonProps = {
   patientId: string
+  triggerLabel?: ReactElement
 }
 
-export function DeletePatientButton({ patientId }: DeletePatientButtonProps) {
+export function DeletePatientButton({ patientId, triggerLabel }: DeletePatientButtonProps) {
   const router = useRouter()
   const [open, setOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
@@ -39,10 +40,14 @@ export function DeletePatientButton({ patientId }: DeletePatientButtonProps) {
   return (
     <Dialog onOpenChange={handleOpenChange} open={open}>
       <DialogTrigger
-        render={<Button className="text-rose-600" variant="outline" />}
-      >
-        Delete
-      </DialogTrigger>
+        render={
+          triggerLabel ?? (
+            <Button variant="destructive">
+              Delete
+            </Button>
+          )
+        }
+      />
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Delete patient?</DialogTitle>
@@ -64,11 +69,11 @@ export function DeletePatientButton({ patientId }: DeletePatientButtonProps) {
           </div>
         ) : null}
         <DialogFooter>
-          <Button onClick={() => handleOpenChange(false)} type="button" variant="outline">
+          <Button onClick={() => handleOpenChange(false)} type="button" variant="ghost">
             Cancel
           </Button>
           <LoadingButton
-            className="bg-rose-600 text-white hover:bg-rose-700"
+            variant="destructive"
             isLoading={isPending}
             loadingText="Deleting..."
             onClick={() => {

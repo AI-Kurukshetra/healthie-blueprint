@@ -40,13 +40,11 @@ export function EHRTimeline({ items }: EHRTimelineProps) {
             key={option.value}
             className={cn(
               "rounded-full px-4",
-              filter === option.value
-                ? "bg-sky-500 text-white hover:bg-sky-600"
-                : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+              filter !== option.value && "text-slate-600"
             )}
             onClick={() => setFilter(option.value)}
             type="button"
-            variant="ghost"
+            variant={filter === option.value ? "default" : "secondary"}
           >
             {option.label}
           </Button>

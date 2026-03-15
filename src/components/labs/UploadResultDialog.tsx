@@ -193,7 +193,7 @@ export function UploadResultDialog({
 
   return (
     <Dialog onOpenChange={setOpen} open={open}>
-      <DialogTrigger render={<div>{triggerLabel}</div>} />
+      <DialogTrigger nativeButton={false} render={<div>{triggerLabel}</div>} />
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>Upload Result</DialogTitle>
@@ -295,11 +295,10 @@ export function UploadResultDialog({
           ) : null}
 
           <DialogFooter>
-            <Button onClick={() => setOpen(false)} type="button" variant="outline">
+            <Button onClick={() => setOpen(false)} type="button" variant="ghost">
               Cancel
             </Button>
             <LoadingButton
-              className="bg-sky-500 text-white hover:bg-sky-600"
               isLoading={isPending}
               loadingText="Saving..."
               type="submit"

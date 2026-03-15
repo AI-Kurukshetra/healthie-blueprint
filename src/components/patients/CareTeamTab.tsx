@@ -57,11 +57,10 @@ function RemoveCareTeamButton({
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <Button onClick={() => setOpen(false)} type="button" variant="outline">
+          <Button onClick={() => setOpen(false)} type="button" variant="ghost">
             Cancel
           </Button>
           <LoadingButton
-            className="bg-rose-600 text-white hover:bg-rose-700"
             isLoading={isPending}
             loadingText="Removing..."
             onClick={() =>
@@ -82,6 +81,7 @@ function RemoveCareTeamButton({
               })
             }
             type="button"
+            variant="destructive"
           >
             Remove
           </LoadingButton>

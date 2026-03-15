@@ -44,7 +44,7 @@ type LabResultDetailProps = {
 export function LabResultDetail({ actions, order }: LabResultDetailProps) {
   return (
     <div className="space-y-6">
-      <section className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
+      <section className="hf-card">
         <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
           <div className="space-y-3">
             <div className="flex flex-wrap items-center gap-2">
@@ -77,7 +77,7 @@ export function LabResultDetail({ actions, order }: LabResultDetailProps) {
       </section>
 
       <section className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
-        <article className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+        <article className="rounded-2xl border border-[var(--border)] bg-white p-5">
           <h2 className="text-lg font-semibold text-slate-950">Order Information</h2>
           <div className="mt-4 space-y-3 text-sm text-slate-600">
             <p>Ordered: {formatDateTime(order.orderedAt)}</p>
@@ -88,13 +88,13 @@ export function LabResultDetail({ actions, order }: LabResultDetailProps) {
           </div>
         </article>
 
-        <article className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+        <article className="rounded-2xl border border-[var(--border)] bg-white p-5">
           <h2 className="text-lg font-semibold text-slate-950">Timeline</h2>
           <div className="mt-4 space-y-3">
             {order.timeline.map((entry, index) => (
               <div
                 key={`${entry.title}-${entry.date}-${index}`}
-                className="rounded-2xl border border-slate-200 bg-slate-50 p-4"
+                className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4"
               >
                 <p className="text-sm font-medium text-slate-950">{entry.title}</p>
                 <p className="mt-1 text-sm text-slate-600">{entry.description}</p>
@@ -105,7 +105,7 @@ export function LabResultDetail({ actions, order }: LabResultDetailProps) {
         </article>
       </section>
 
-      <section className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
+      <section className="hf-card">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div>
             <h2 className="text-lg font-semibold text-slate-950">Result</h2>
@@ -170,3 +170,4 @@ export function LabResultDetail({ actions, order }: LabResultDetailProps) {
     </div>
   )
 }
+

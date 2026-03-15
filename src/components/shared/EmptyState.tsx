@@ -1,4 +1,5 @@
 import type { ReactNode } from "react"
+import { Users } from "lucide-react"
 
 type EmptyStateProps = {
   title: string
@@ -14,13 +15,15 @@ export function EmptyState({
   action,
 }: EmptyStateProps) {
   return (
-    <div className="rounded-3xl border border-dashed border-sky-200 bg-white/80 p-10 text-center shadow-sm">
-      {icon ? <div className="mx-auto mb-4 flex justify-center text-sky-600">{icon}</div> : null}
-      <div className="space-y-2">
-        <h3 className="text-lg font-semibold text-slate-900">{title}</h3>
-        <p className="mx-auto max-w-md text-sm text-slate-600">{description}</p>
+    <div className="hf-card text-center">
+      <div className="mx-auto flex w-full max-w-md flex-col items-center">
+        <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-[var(--teal-light)] text-[var(--teal)]">
+          {icon ?? <Users className="h-10 w-10" />}
+        </div>
+        <h3 className="text-xl font-semibold text-[var(--navy)]">{title}</h3>
+        <p className="mt-2 text-sm text-[var(--text-muted)]">{description}</p>
+        {action ? <div className="mt-5 flex justify-center">{action}</div> : null}
       </div>
-      {action ? <div className="mt-6 flex justify-center">{action}</div> : null}
     </div>
   )
 }

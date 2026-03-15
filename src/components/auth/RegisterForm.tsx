@@ -1,13 +1,14 @@
 "use client"
 
 import Link from "next/link"
-import { useEffect, useState, useTransition } from "react"
+import { useState, useTransition } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Eye, EyeOff, HeartPulse, ShieldCheck, Stethoscope, UserRound } from "lucide-react"
 import { Controller, useForm, useWatch } from "react-hook-form"
 import { toast } from "sonner"
 
 import { registerAction } from "@/actions/auth"
+import { DatePicker } from "@/components/shared/DatePicker"
 import { LoadingButton } from "@/components/shared/LoadingButton"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -55,7 +56,6 @@ export function RegisterForm() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [formError, setFormError] = useState<string>()
   const [formSuccess, setFormSuccess] = useState<string>()
-  const [maxDateOfBirth, setMaxDateOfBirth] = useState("")
 
   const form = useForm<RegisterFormInput>({
     resolver: zodResolver(registerFormSchema),
@@ -80,10 +80,6 @@ export function RegisterForm() {
     control: form.control,
     name: "gender",
   })
-
-  useEffect(() => {
-    setMaxDateOfBirth(new Date().toISOString().split("T")[0])
-  }, [])
 
   const preserveSharedValues = () => ({
     full_name: form.getValues("full_name"),
@@ -184,15 +180,15 @@ export function RegisterForm() {
             <button
               key={optionRole}
               className={cn(
-                "rounded-2xl border px-4 py-4 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500",
+                "rounded-2xl border px-4 py-4 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--teal)]",
                 role === optionRole
-                  ? "border-sky-500 bg-sky-50 shadow-sm"
-                  : "border-slate-200 bg-white hover:border-sky-200 hover:bg-slate-50"
+                  ? "border-2 border-[var(--teal)] bg-[var(--teal-light)] shadow-[0_0_0_3px_rgba(0,212,184,0.12)]"
+                  : "border-2 border-[#E2E8F0] bg-white hover:border-[var(--teal)]/35 hover:bg-[var(--teal-light)]"
               )}
               onClick={() => handleRoleChange(optionRole)}
               type="button"
             >
-              <div className="mb-3 inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-slate-900 text-white">
+              <div className="mb-3 inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--teal-light)] text-[var(--teal-dark)]">
                 <Icon className="h-5 w-5" />
               </div>
               <p className="text-base font-semibold text-slate-950">{title}</p>
@@ -240,7 +236,7 @@ export function RegisterForm() {
             />
             <Button
               aria-label={showPassword ? "Hide password" : "Show password"}
-              className="absolute top-1/2 right-1 h-9 w-9 -translate-y-1/2 text-slate-500 hover:text-slate-700"
+              className="absolute top-1/2 right-1 h-9 w-9 -translate-y-1/2 text-[var(--text-hint)] hover:text-[var(--teal)]"
               onClick={() => setShowPassword((value) => !value)}
               size="icon"
               type="button"
@@ -267,7 +263,7 @@ export function RegisterForm() {
               aria-label={
                 showConfirmPassword ? "Hide confirmed password" : "Show confirmed password"
               }
-              className="absolute top-1/2 right-1 h-9 w-9 -translate-y-1/2 text-slate-500 hover:text-slate-700"
+              className="absolute top-1/2 right-1 h-9 w-9 -translate-y-1/2 text-[var(--text-hint)] hover:text-[var(--teal)]"
               onClick={() => setShowConfirmPassword((value) => !value)}
               size="icon"
               type="button"
@@ -284,7 +280,7 @@ export function RegisterForm() {
         </div>
 
         {role === "patient" ? (
-          <div className="space-y-4 rounded-2xl border border-slate-200 bg-slate-50 p-5 sm:col-span-2">
+          <div className="space-y-4 rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] p-5 sm:col-span-2">
             <div className="space-y-1">
               <h3 className="text-base font-semibold text-slate-950">Consent & Agreements</h3>
               <p className="text-sm text-slate-600">
@@ -296,7 +292,7 @@ export function RegisterForm() {
               control={form.control}
               name="consent_treatment"
               render={({ field }) => (
-                <label className="flex items-start gap-3 rounded-2xl bg-white p-4">
+                <label className="flex items-start gap-3 rounded-2xl border border-[#E2E8F0] bg-white p-4">
                   <Checkbox
                     checked={field.value}
                     id="consent-treatment"
@@ -319,7 +315,7 @@ export function RegisterForm() {
               control={form.control}
               name="consent_telehealth"
               render={({ field }) => (
-                <label className="flex items-start gap-3 rounded-2xl bg-white p-4">
+                <label className="flex items-start gap-3 rounded-2xl border border-[#E2E8F0] bg-white p-4">
                   <Checkbox
                     checked={field.value}
                     id="consent-telehealth"
@@ -342,7 +338,7 @@ export function RegisterForm() {
               control={form.control}
               name="consent_terms"
               render={({ field }) => (
-                <label className="flex items-start gap-3 rounded-2xl bg-white p-4">
+                <label className="flex items-start gap-3 rounded-2xl border border-[#E2E8F0] bg-white p-4">
                   <Checkbox
                     checked={field.value}
                     id="consent-terms"
@@ -379,13 +375,19 @@ export function RegisterForm() {
           <>
             <div className="space-y-2">
               <Label htmlFor="register-dob">Date of Birth</Label>
-              <Input
-                id="register-dob"
-                max={maxDateOfBirth || undefined}
-                type="date"
-                {...form.register("date_of_birth")}
+              <Controller
+                control={form.control}
+                name="date_of_birth"
+                render={({ field, fieldState }) => (
+                  <DatePicker
+                    maxDate={new Date()}
+                    onChange={field.onChange}
+                    placeholder="Select your date of birth"
+                    value={field.value}
+                    error={fieldState.error?.message}
+                  />
+                )}
               />
-              <FormMessage message={form.formState.errors.date_of_birth?.message} />
             </div>
 
             <div className="space-y-2">
@@ -447,9 +449,9 @@ export function RegisterForm() {
         )}
       </div>
 
-      <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+      <div className="rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] p-4">
         <div className="flex items-start gap-3">
-          <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white text-sky-600 shadow-sm">
+          <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white text-[var(--teal-dark)] shadow-sm">
             {role === "provider" ? (
               <ShieldCheck className="h-5 w-5" />
             ) : (
@@ -469,15 +471,15 @@ export function RegisterForm() {
         </div>
       </div>
 
-      <FormMessage className="rounded-xl bg-rose-50 px-3 py-2" message={formError} />
+      <FormMessage className="hf-alert-error" message={formError} />
       <FormMessage
-        className="rounded-xl bg-emerald-50 px-3 py-2"
+        className="hf-alert-success"
         message={formSuccess}
         variant="success"
       />
 
       <LoadingButton
-        className="h-11 w-full rounded-xl bg-sky-500 text-white shadow-sm hover:bg-sky-600"
+        className="w-full"
         isLoading={isPending}
         loadingText="Creating account..."
         type="submit"
@@ -488,7 +490,7 @@ export function RegisterForm() {
       <p className="text-center text-sm text-slate-600">
         Already have an account?{" "}
         <Link
-          className="font-medium text-sky-600 transition hover:text-sky-700"
+          className="font-semibold text-[var(--teal-dark)] transition hover:text-[var(--teal)]"
           href="/login"
         >
           Sign in
@@ -497,3 +499,4 @@ export function RegisterForm() {
     </form>
   )
 }
+

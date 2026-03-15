@@ -158,7 +158,7 @@ export function LabOrderList({
 
   return (
     <div className="space-y-6">
-      <section className="flex flex-col gap-4 rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm lg:flex-row lg:items-end lg:justify-between">
+      <section className="flex flex-col gap-4 hf-card lg:flex-row lg:items-end lg:justify-between">
         <div>
           <h2 className="text-2xl font-semibold text-slate-950">{heading}</h2>
           <p className="mt-2 text-sm text-slate-600">{description}</p>
@@ -168,14 +168,14 @@ export function LabOrderList({
           patients={patients}
           prefilledPatientId={prefilledPatientId}
           triggerLabel={
-            <Button className="bg-sky-500 text-white hover:bg-sky-600">
+            <Button>
               {orderButtonLabel}
             </Button>
           }
         />
       </section>
 
-      <section className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
+      <section className="hf-card">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex flex-wrap gap-2">
             {tabs.map((item) => (
@@ -183,8 +183,8 @@ export function LabOrderList({
                 key={item}
                 className={`min-h-11 rounded-full px-4 text-sm font-medium transition ${
                   tab === item
-                    ? "bg-sky-500 text-white"
-                    : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                    ? "bg-[var(--teal)] text-white"
+                    : "text-[var(--text-muted)] hover:text-[var(--navy)]"
                 }`}
                 onClick={() => setTab(item)}
                 type="button"
@@ -224,7 +224,7 @@ export function LabOrderList({
             return (
               <article
                 key={order.id}
-                className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm"
+                className="rounded-2xl border border-[var(--border)] bg-white p-5"
               >
                 <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
                   <div className="space-y-2">
@@ -280,14 +280,13 @@ export function LabOrderList({
                     </Link>
                     {canCancel ? (
                       <Button
-                        className="border-rose-200 text-rose-600 hover:bg-rose-50"
                         onClick={() => {
                           setFormError(undefined)
                           setCancelTarget(order)
                         }}
                         size="sm"
                         type="button"
-                        variant="outline"
+                        variant="destructive"
                       >
                         Cancel
                       </Button>
@@ -344,11 +343,11 @@ export function LabOrderList({
               Keep Order
             </Button>
             <LoadingButton
-              className="bg-rose-600 text-white hover:bg-rose-700"
               isLoading={isPending}
               loadingText="Cancelling..."
               onClick={handleCancel}
               type="button"
+              variant="destructive"
             >
               Confirm Cancel
             </LoadingButton>
@@ -358,3 +357,4 @@ export function LabOrderList({
     </div>
   )
 }
+

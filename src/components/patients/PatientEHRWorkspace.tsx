@@ -89,7 +89,7 @@ export function PatientEHRWorkspace({
   return (
     <div className="space-y-6">
       <section className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
-        <p className="text-sm font-medium text-sky-600">Electronic health record</p>
+        <p className="text-sm font-medium text-[var(--teal-dark)]">Electronic health record</p>
         <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">
           EHR for {patientName}
         </h1>
@@ -101,7 +101,7 @@ export function PatientEHRWorkspace({
 
       <section className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
         <Tabs defaultValue="medications">
-          <TabsList variant="line">
+          <TabsList variant="default">
             <TabsTrigger value="medications">Medications</TabsTrigger>
             <TabsTrigger value="history">Medical History</TabsTrigger>
             <TabsTrigger value="prescriptions">Prescriptions</TabsTrigger>
@@ -121,7 +121,7 @@ export function PatientEHRWorkspace({
                   onComplete={refreshData}
                   patientId={patientId}
                   triggerLabel={
-                    <Button className="bg-sky-500 text-white hover:bg-sky-600">
+                    <Button>
                       <Plus className="h-4 w-4" />
                       Add
                     </Button>
@@ -139,7 +139,7 @@ export function PatientEHRWorkspace({
                   {activeMedications.map((medication) => (
                     <article
                       key={medication.id}
-                      className="rounded-3xl border border-slate-200 p-5"
+                      className="rounded-3xl border border-[var(--border)] border-l-4 border-l-[var(--teal)] p-5 rounded-2xl"
                     >
                       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                         <div className="space-y-2">
@@ -173,11 +173,10 @@ export function PatientEHRWorkspace({
                             }
                           />
                           <Button
-                            className="text-rose-600 hover:bg-rose-50"
                             onClick={() => setStopTarget(medication)}
                             size="sm"
                             type="button"
-                            variant="outline"
+                            variant="destructive"
                           >
                             Stop
                           </Button>
@@ -188,7 +187,7 @@ export function PatientEHRWorkspace({
                 </div>
               )}
 
-              <details className="rounded-3xl border border-slate-200 bg-slate-50 p-5">
+              <details className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5">
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-lg font-semibold text-slate-950">
                   <span>Past Medications</span>
                   <ChevronDown className="h-4 w-4" />
@@ -202,7 +201,7 @@ export function PatientEHRWorkspace({
                     pastMedications.map((medication) => (
                       <article
                         key={medication.id}
-                        className="rounded-2xl border border-slate-200 bg-white p-4"
+                        className="rounded-xl border border-[var(--border)] bg-white p-4"
                       >
                         <div className="flex flex-wrap items-start justify-between gap-3">
                           <div>
@@ -249,7 +248,7 @@ export function PatientEHRWorkspace({
                   onComplete={refreshData}
                   patientId={patientId}
                   triggerLabel={
-                    <Button className="bg-sky-500 text-white hover:bg-sky-600">
+                    <Button>
                       <Plus className="h-4 w-4" />
                       Add
                     </Button>
@@ -267,7 +266,7 @@ export function PatientEHRWorkspace({
                   {history.map((record) => (
                     <article
                       key={record.id}
-                      className="rounded-3xl border border-slate-200 p-5"
+                      className="rounded-3xl border border-[var(--border)] border-l-4 border-l-[var(--teal)] p-5 rounded-2xl"
                     >
                       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                         <div className="space-y-2">
@@ -326,7 +325,7 @@ export function PatientEHRWorkspace({
                   patientId={patientId}
                   patientName={patientName}
                   triggerLabel={
-                    <Button className="bg-sky-500 text-white hover:bg-sky-600">
+                    <Button>
                       <Plus className="h-4 w-4" />
                       New Rx
                     </Button>
@@ -344,7 +343,7 @@ export function PatientEHRWorkspace({
                   {prescriptions.map((prescription) => (
                     <article
                       key={prescription.id}
-                      className="rounded-3xl border border-slate-200 p-5"
+                      className="rounded-3xl border border-[var(--border)] border-l-4 border-l-[var(--teal)] p-5 rounded-2xl"
                     >
                       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                         <div className="space-y-2">
@@ -407,11 +406,11 @@ export function PatientEHRWorkspace({
             This will set the medication inactive and use today as the end date.
           </div>
           <DialogFooter>
-            <Button onClick={() => setStopTarget(null)} type="button" variant="outline">
+            <Button onClick={() => setStopTarget(null)} type="button" variant="ghost">
               Cancel
             </Button>
             <LoadingButton
-              className="bg-rose-600 text-white hover:bg-rose-700"
+              variant="destructive"
               isLoading={isPending}
               loadingText="Stopping..."
               onClick={handleStopMedication}
@@ -425,3 +424,4 @@ export function PatientEHRWorkspace({
     </div>
   )
 }
+

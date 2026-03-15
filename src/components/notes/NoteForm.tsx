@@ -4,6 +4,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useState, useTransition } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { Activity, HeartPulse, Ruler, Scale, Thermometer, Wind } from "lucide-react"
 import { Controller, useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { z } from "zod"
@@ -20,7 +21,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog"
 import { FormMessage } from "@/components/ui/form-message"
 import { Input } from "@/components/ui/input"
@@ -30,7 +30,6 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 
@@ -77,6 +76,58 @@ const noteFormSchema = z.object({
   weight: z.string(),
 })
 
+const vitalFields: Array<{ field: keyof NoteFormValues; icon: typeof Activity; label: string; placeholder: string }> = [
+  { field: "bp_systolic", icon: HeartPulse, label: "BP Systolic", placeholder: "mmHg" },
+  { field: "bp_diastolic", icon: HeartPulse, label: "BP Diastolic", placeholder: "mmHg" },
+  { field: "heart_rate", icon: Activity, label: "Heart Rate", placeholder: "bpm" },
+  { field: "temperature", icon: Thermometer, label: "Temperature", placeholder: "C" },
+  { field: "weight", icon: Scale, label: "Weight", placeholder: "kg" },
+  { field: "height", icon: Ruler, label: "Height", placeholder: "cm" },
+  { field: "oxygen_sat", icon: Wind, label: "O2 Saturation", placeholder: "%" },
+]
+
+const soapSections: Array<{
+  field: keyof NoteFormValues
+  hint: string
+  letter: string
+  subtitle: string
+  title: string
+  tone: string
+}> = [
+  {
+    field: "subjective",
+    hint: "Chief complaint, symptoms, patient-reported history",
+    letter: "S",
+    subtitle: "Subjective",
+    title: "Subjective",
+    tone: "border-[var(--teal)] bg-[var(--teal-light)] text-[var(--teal-dark)]",
+  },
+  {
+    field: "objective",
+    hint: "Physical exam findings, observed signs, measured values",
+    letter: "O",
+    subtitle: "Objective",
+    title: "Objective",
+    tone: "border-[#8B5CF6] bg-[#F3E8FF] text-[#7C3AED]",
+  },
+  {
+    field: "assessment",
+    hint: "Clinical interpretation and diagnosis",
+    letter: "A",
+    subtitle: "Assessment",
+    title: "Assessment",
+    tone: "border-[#F59E0B] bg-[#FFFBEB] text-[#B45309]",
+  },
+  {
+    field: "plan",
+    hint: "Treatment plan, medications, follow-up",
+    letter: "P",
+    subtitle: "Plan",
+    title: "Plan",
+    tone: "border-[var(--navy)] bg-[#E2E8F0] text-[var(--navy)]",
+  },
+]
+
 export function NoteForm({
   appointmentOptions,
   initialValues,
@@ -88,11 +139,18 @@ export function NoteForm({
   const router = useRouter()
   const [isSaving, startSaving] = useTransition()
   const [isSigning, startSigning] = useTransition()
+  const [isSignConfirmOpen, setIsSignConfirmOpen] = useState(false)
   const [formError, setFormError] = useState<string>()
   const form = useForm<NoteFormValues>({
     defaultValues: initialValues,
     resolver: zodResolver(noteFormSchema),
   })
+  const selectedPatientId = form.watch("patient_id")
+  const selectedAppointmentId = form.watch("appointment_id")
+  const selectedPatient =
+    patientOptions.find((patient) => patient.id === selectedPatientId) ?? null
+  const selectedAppointment =
+    appointmentOptions.find((appointment) => appointment.id === selectedAppointmentId) ?? null
 
   const applyServerErrors = (fieldErrors?: Record<string, string[] | undefined>) => {
     if (!fieldErrors) {
@@ -146,9 +204,18 @@ export function NoteForm({
     })
   )
 
+  const openSignConfirmIfValid = async () => {
+    setFormError(undefined)
+    const isValid = await form.trigger(undefined, { shouldFocus: true })
+    if (!isValid) {
+      return
+    }
+    setIsSignConfirmOpen(true)
+  }
+
   return (
-    <form className="space-y-6">
-      <section className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
+    <form className="space-y-6 pb-28">
+      <section className="rounded-2xl border border-[var(--border)] border-l-4 border-l-[var(--teal)] bg-white p-5">
         <div className="grid gap-5 md:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="patient_id">Patient</Label>
@@ -161,8 +228,18 @@ export function NoteForm({
                   onValueChange={field.onChange}
                   value={field.value}
                 >
-                  <SelectTrigger className="h-10 w-full" id="patient_id">
-                    <SelectValue placeholder="Select patient" />
+                  <SelectTrigger className="w-full" id="patient_id">
+                    <span
+                      className={
+                        selectedPatient
+                          ? "flex flex-1 text-left"
+                          : "flex flex-1 text-left text-muted-foreground"
+                      }
+                    >
+                      {selectedPatient
+                        ? `${selectedPatient.patientName} (${selectedPatient.patientId})`
+                        : "Select patient"}
+                    </span>
                   </SelectTrigger>
                   <SelectContent>
                     {patientOptions.map((patient) => (
@@ -188,8 +265,16 @@ export function NoteForm({
                   onValueChange={(value) => field.onChange(value === "none" ? "" : value)}
                   value={field.value || "none"}
                 >
-                  <SelectTrigger className="h-10 w-full" id="appointment_id">
-                    <SelectValue placeholder="Select appointment" />
+                  <SelectTrigger className="w-full" id="appointment_id">
+                    <span
+                      className={
+                        selectedAppointment
+                          ? "flex flex-1 text-left"
+                          : "flex flex-1 text-left text-muted-foreground"
+                      }
+                    >
+                      {selectedAppointment ? selectedAppointment.label : "Standalone note"}
+                    </span>
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="none">Standalone note</SelectItem>
@@ -206,63 +291,63 @@ export function NoteForm({
         </div>
       </section>
 
-      <section className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
-        <h2 className="text-lg font-semibold text-slate-950">Vitals</h2>
-        <div className="mt-5 grid gap-5 md:grid-cols-3">
-          {[
-            ["bp_systolic", "BP Systolic"],
-            ["bp_diastolic", "BP Diastolic"],
-            ["heart_rate", "Heart Rate"],
-            ["temperature", "Temperature"],
-            ["weight", "Weight"],
-            ["height", "Height"],
-            ["oxygen_sat", "O2 Saturation"],
-          ].map(([field, label]) => (
+      <section className="overflow-hidden rounded-[14px] border border-[var(--border)] bg-white">
+        <div className="bg-[var(--navy)] px-5 py-3.5">
+          <h2 className="text-sm font-semibold text-white">Vital Signs</h2>
+        </div>
+        <div className="grid gap-4 p-5 md:grid-cols-3">
+          {vitalFields.map(({ field, icon: Icon, label, placeholder }) => (
             <div key={field} className="space-y-2">
-              <Label htmlFor={field}>{label}</Label>
+              <Label htmlFor={field}>
+                <span className="inline-flex items-center gap-1.5 text-[var(--teal-dark)]">
+                  <Icon className="h-3.5 w-3.5" />
+                  {label}
+                </span>
+              </Label>
               <Input
                 disabled={readOnly}
                 id={field}
                 inputMode="decimal"
-                {...form.register(field as keyof NoteFormValues)}
-              />
-              <FormMessage
-                message={form.formState.errors[field as keyof NoteFormValues]?.message as string | undefined}
-              />
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
-        <h2 className="text-lg font-semibold text-slate-950">SOAP Sections</h2>
-        <div className="mt-5 space-y-5">
-          {[
-            ["subjective", "Subjective", "Chief complaint, symptoms, patient's own words"],
-            ["objective", "Objective", "Physical exam findings, test results, observations"],
-            ["assessment", "Assessment", "Diagnosis, clinical impression"],
-            ["plan", "Plan", "Treatment, prescriptions, follow-up instructions"],
-          ].map(([field, label, placeholder]) => (
-            <div key={field} className="space-y-2">
-              <Label htmlFor={field}>{label}</Label>
-              <Textarea
-                disabled={readOnly}
-                id={field}
                 placeholder={placeholder}
-                rows={field === "objective" ? 4 : 5}
-                {...form.register(field as keyof NoteFormValues)}
+                {...form.register(field)}
               />
               <FormMessage
-                message={form.formState.errors[field as keyof NoteFormValues]?.message as string | undefined}
+                message={form.formState.errors[field]?.message as string | undefined}
               />
             </div>
           ))}
         </div>
       </section>
 
-      <section className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
-        <h2 className="text-lg font-semibold text-slate-950">Diagnosis Codes</h2>
-        <div className="mt-5">
+      <section className="space-y-4">
+        {soapSections.map((section) => (
+          <article key={section.field} className={`rounded-[14px] border border-[var(--border)] bg-white p-5`}>
+            <div className="mb-4 flex items-start gap-3 border-b border-[#F1F5F9] pb-4">
+              <span className={`inline-flex h-8 w-8 items-center justify-center rounded-full border text-sm font-bold ${section.tone}`}>
+                {section.letter}
+              </span>
+              <div>
+                <h3 className="hf-card-title">{section.title}</h3>
+                <p className="mt-1 text-xs text-[var(--text-muted)]">{section.hint}</p>
+              </div>
+            </div>
+            <Textarea
+              disabled={readOnly}
+              id={section.field}
+              className="min-h-[120px] resize-y border-0 bg-transparent px-0 py-0 focus-visible:ring-0"
+              placeholder={section.subtitle}
+              {...form.register(section.field)}
+            />
+            <FormMessage
+              message={form.formState.errors[section.field]?.message as string | undefined}
+            />
+          </article>
+        ))}
+      </section>
+
+      <section className="rounded-[14px] border border-[var(--border)] bg-white p-5">
+        <h2 className="hf-card-title">Diagnosis Codes</h2>
+        <div className="mt-4">
           <Controller
             control={form.control}
             name="diagnosis_codes"
@@ -278,77 +363,69 @@ export function NoteForm({
       </section>
 
       {signedAt ? (
-        <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+        <div className="hf-alert-success">
           Signed note on {new Date(signedAt).toLocaleString()}.
         </div>
       ) : null}
 
-      <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
-        <Link href="/notes">
-          <Button className="w-full sm:w-auto" type="button" variant="outline">
-            Back to Notes
-          </Button>
-        </Link>
-        {!readOnly ? (
-          <>
-            <LoadingButton
-              className="w-full sm:w-auto"
-              isLoading={isSaving}
-              loadingText="Saving..."
-              onClick={() => void submitDraft()}
-              type="button"
-              variant="outline"
-            >
-              Save as Draft
-            </LoadingButton>
+      {formError ? <div className="hf-alert-error">{formError}</div> : null}
 
-            {formError ? (
-              <div
-                className="w-full rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700 sm:order-last sm:w-auto sm:min-w-[320px]"
-                role="alert"
+      <div className="sticky bottom-0 z-10 -mx-4 border-t border-[var(--border)] bg-white px-4 py-4 shadow-[0_-6px_20px_rgba(15,23,42,0.05)] sm:-mx-8 sm:px-8">
+        <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
+          <Link href="/notes">
+            <Button className="w-full sm:w-auto" type="button" variant="outline">
+              Back to Notes
+            </Button>
+          </Link>
+          {!readOnly ? (
+            <>
+              <LoadingButton
+                className="w-full sm:w-auto"
+                isLoading={isSaving}
+                loadingText="Saving..."
+                onClick={() => void submitDraft()}
+                type="button"
+                variant="secondary"
               >
-                {formError}
-              </div>
-            ) : null}
+                Save as Draft
+              </LoadingButton>
 
-            <Dialog>
-              <DialogTrigger
-                render={
-                  <LoadingButton
-                    className="w-full bg-sky-500 text-white hover:bg-sky-600 sm:w-auto"
-                    isLoading={isSigning}
-                    loadingText="Signing..."
-                    type="button"
-                  />
-                }
+              <LoadingButton
+                className="w-full sm:w-auto"
+                isLoading={isSigning}
+                loadingText="Signing..."
+                onClick={() => void openSignConfirmIfValid()}
+                type="button"
               >
                 Sign Note
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Sign note?</DialogTitle>
-                  <DialogDescription>
-                    Signed notes cannot be edited. Proceed?
-                  </DialogDescription>
-                </DialogHeader>
-                <DialogFooter>
-                  <DialogClose render={<Button type="button" variant="outline" />}>
-                    Cancel
-                  </DialogClose>
-                  <LoadingButton
-                    className="bg-sky-500 text-white hover:bg-sky-600"
-                    isLoading={isSigning}
-                    loadingText="Signing..."
-                    onClick={() => void submitSign()}
-                    type="button"
-                  >
-                    Confirm Sign
-                  </LoadingButton>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-          </>
-        ) : null}
+              </LoadingButton>
+
+              <Dialog onOpenChange={setIsSignConfirmOpen} open={isSignConfirmOpen}>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Sign note?</DialogTitle>
+                    <DialogDescription>
+                      Signed notes cannot be edited. Proceed?
+                    </DialogDescription>
+                  </DialogHeader>
+                  <DialogFooter>
+                    <DialogClose render={<Button type="button" variant="ghost" />}>
+                      Cancel
+                    </DialogClose>
+                    <LoadingButton
+                      isLoading={isSigning}
+                      loadingText="Signing..."
+                      onClick={() => void submitSign()}
+                      type="button"
+                    >
+                      Confirm Sign
+                    </LoadingButton>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </>
+          ) : null}
+        </div>
       </div>
     </form>
   )
